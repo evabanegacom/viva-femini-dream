@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 md:px-8 py-4 md:py-6">
-        <Outlet />
+        {children}
       </main>
 
       {/* Mobile bottom nav */}
