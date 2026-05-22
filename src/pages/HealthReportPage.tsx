@@ -1,46 +1,52 @@
-import { Download, FileText, ChevronDown } from "lucide-react";
-import { useMemo } from "react";
+import LineChart from "@/components/line-chart";
+import { Download, FileText, ChevronDown, RefreshCw, AlertCircle } from "lucide-react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 
-const summary = [
-  { label: "Cycle Length", value: "28 Days", borderColor:'#F36F56', color: "bg-rose-50 text-rose-600", icon: "🌸" },
-  { label: "Period Duration", value: "6 Days", borderColor: '#FB3179', color: "bg-amber-50 text-amber-600", icon: "💧" },
-  { label: "Estimated Next Period", value: "Nov 1", borderColor: '#7E19DF', color: "bg-purple-50 text-purple-600", icon: "📅" },
-  { label: "Ovulation Window", value: "Oct 17-22", borderColor: '#0D34F9', color: "bg-blue-50 text-blue-600", icon: "🔵" },
-];
+const BASE_URL = "http://localhost:3000/api/v1";
 
-const chartData = [3, 4, 6, 8, 5, 7, 9, 7, 6, 4, 5, 3, 2];
+/** Seeds the DB and returns the demo userId. Safe to call repeatedly. */
+async function seedAndGetUserId(): Promise<string> {
+  const res = await fetch(`${BASE_URL}/seed`, { method: "POST" });
+  if (!res.ok) throw { message: `Seed failed: ${res.status} ${res.statusText}`, status: res.status };
+  const json = await res.json();
+  const uid = json?.data?.userId;
+  if (!uid) throw { message: "Seed response missing userId", status: 500 };
+  return uid as string;
+}
 
-function LineChart() {
-  const w = 600, h = 200, pad = 30;
-  const max = 10;
-  const stepX = (w - pad * 2) / (chartData.length - 1);
-  const pts = chartData.map((v, i) => [pad + i * stepX, h - pad - (v / max) * (h - pad * 2)] as const);
-  const path = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
-  const area = `${path} L${pts[pts.length-1][0]},${h-pad} L${pts[0][0]},${h-pad} Z`;
+async function fetchHealthReport(userId: string, month?: string): Promise<HealthReport> {
+  const params = new URLSearchParams({ userId });
+  if (month) params.set("month", month);
+  const res = await fetch(`${BASE_URL}/health-report?${params}`);
+  if (!res.ok) throw { message: `Server error: ${res.status} ${res.statusText}`, status: res.status };
+  const json: ApiResponse = await res.json();
+  if (!json.success) throw { message: "API returned success: false", status: 500 };
+  const d = json.data;
+  return {
+    cycleSummary: d.cycleSummary,
+    flowSummary: {
+      averageCycleLength: d.flowAndSymptomsSummary.averageCycleLength,
+      narrative: d.flowAndSymptomsSummary.narrative,
+      tips: d.flowAndSymptomsSummary.tips,
+    },
+    donuts: d.symptomFrequency.donuts,
+    historicalCycles: d.historicalCycleData,
+    flowChartData: d.periodLengthChart,
+  };
+}
+
+// ─── Skeleton helpers ─────────────────────────────────────────────────────────
+
+function Skeleton({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-      <defs>
-        <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.7 0.22 0)" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="oklch(0.7 0.22 0)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {[0, 2, 4, 6, 8, 10].map((y) => (
-        <line key={y} x1={pad} x2={w - pad} y1={h - pad - (y / max) * (h - pad * 2)} y2={h - pad - (y / max) * (h - pad * 2)} stroke="oklch(0.93 0.01 320)" strokeDasharray="2 4" />
-      ))}
-      <path d={area} fill="url(#grad)" />
-      <path d={path} fill="none" stroke="oklch(0.62 0.22 0)" strokeWidth="2.5" />
-      {pts.map((p, i) => (
-        <circle key={i} cx={p[0]} cy={p[1]} r="4" fill="white" stroke="oklch(0.62 0.22 0)" strokeWidth="2" />
-      ))}
-      {chartData.map((_, i) => (
-        <text key={i} x={pad + i * (w - pad * 2) / (chartData.length - 1)} y={h - 8} textAnchor="middle" fontSize="9" fill="oklch(0.5 0.03 320)">
-          {`10-${(i + 1).toString().padStart(2, '0')}`}
-        </text>
-      ))}
-    </svg>
+    <div
+      className={`animate-pulse bg-gradient-to-r from-rose-50 via-pink-100/60 to-rose-50 bg-[length:200%_100%] rounded-xl ${className}`}
+      style={{ animation: "skeleton-shimmer 1.6s ease-in-out infinite" }}
+    />
   );
 }
+
+// ─── Chart Components ─────────────────────────────────────────────────────────
 
 function Donut({ value, label, color }: { value: number; label: string; color: string }) {
   const r = 28, c = 2 * Math.PI * r;
@@ -50,7 +56,14 @@ function Donut({ value, label, color }: { value: number; label: string; color: s
       <div className="relative">
         <svg width="72" height="72" viewBox="0 0 72 72" className="-rotate-90">
           <circle cx="36" cy="36" r={r} fill="none" stroke="oklch(0.94 0.01 320)" strokeWidth="7" />
-          <circle cx="36" cy="36" r={r} fill="none" stroke={color} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${dash} ${c}`} />
+          <circle
+            cx="36" cy="36" r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeDasharray={`${dash} ${c}`}
+          />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center text-xs font-bold">{value}%</div>
       </div>
@@ -62,27 +75,257 @@ function Donut({ value, label, color }: { value: number; label: string; color: s
   );
 }
 
-export function HealthReportPage() {
-  const rows = useMemo(
-    () => Array.from({ length: 12 }).map((_, i) => ({
-      date: `Oct ${(15 + i).toString().padStart(2, '0')}th`,
-      time: "01:42 am",
-      symptom: "Physical Pain",
-      total: ["8/10", "5/10", "7/10", "6/10", "8/10", "4/10", "9/10"][i % 7],
-      note: "After lunch",
-    })),
-    []
+const DONUT_COLORS = [
+  "oklch(0.65 0.22 0)",
+  "oklch(0.6 0.22 320)",
+  "oklch(0.7 0.18 140)",
+  "oklch(0.7 0.22 30)",
+  "oklch(0.7 0.22 60)",
+  "oklch(0.6 0.22 270)",
+];
+
+// ─── Loading skeleton for the full page ───────────────────────────────────────
+
+function HealthReportSkeleton() {
+  return (
+    <div className="space-y-4 md:space-y-6 animate-in fade-in duration-300">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Cycle Summary skeleton */}
+        <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-3">
+          <Skeleton className="h-5 w-48" />
+          <div className="flex flex-wrap gap-2">
+            {[120, 110, 130, 145].map((w, i) => (
+              <Skeleton key={i} className="h-7 rounded-full" style={{ width: w }} />
+            ))}
+          </div>
+        </div>
+        {/* Flow & Symptom summary skeleton */}
+        <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-5/6" />
+          <Skeleton className="h-3 w-3/4" />
+          <Skeleton className="h-4 w-32 mt-2" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-4/5" />
+        </div>
+        {/* Line chart skeleton */}
+        <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-3">
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-3 w-64" />
+          <Skeleton className="h-44 w-full mt-2" />
+        </div>
+        {/* Symptom frequency skeleton */}
+        <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-3">
+          <Skeleton className="h-5 w-44" />
+          <Skeleton className="h-3 w-60" />
+          <div className="grid grid-cols-3 gap-3 mt-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <Skeleton className="size-[72px] rounded-full" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Table skeleton */}
+      <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-44" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="h-9 w-32 rounded-full" />
+        </div>
+        <div className="space-y-3 mt-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex justify-between items-center border-b border-border/40 pb-3">
+              <div className="space-y-1">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-2.5 w-14" />
+              </div>
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-10" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`
+        @keyframes skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
+    </div>
   );
+}
+
+// ─── Error state ──────────────────────────────────────────────────────────────
+
+function ErrorState({ error, onRetry }: { error: ApiError; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[40vh] text-center gap-5 animate-in fade-in duration-300">
+      <div className="size-16 rounded-full bg-rose-50 flex items-center justify-center">
+        <AlertCircle className="size-8 text-rose-400" />
+      </div>
+      <div>
+        <h3 className="font-semibold text-foreground">Couldn't load your health report</h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+          {error.status === 404
+            ? "No health data found for this account. Start logging your cycle to generate a report."
+            : error.message || "Something went wrong. Please try again."}
+        </p>
+      </div>
+      {error.status !== 404 && (
+        <button
+          onClick={onRetry}
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
+        >
+          <RefreshCw className="size-4" /> Try again
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Derived display helpers ──────────────────────────────────────────────────
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "—";
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return dateStr;
+  }
+}
+
+function deriveOvulationWindow(startDate: string, cycleLength: number): string {
+  try {
+    const start = new Date(startDate);
+    const ovStart = new Date(start);
+    ovStart.setDate(start.getDate() + cycleLength - 16);
+    const ovEnd = new Date(start);
+    ovEnd.setDate(start.getDate() + cycleLength - 12);
+    return `${ovStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${ovEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+  } catch {
+    return "—";
+  }
+}
+
+function deriveNextPeriod(startDate: string, cycleLength: number): string {
+  try {
+    const next = new Date(startDate);
+    next.setDate(next.getDate() + cycleLength);
+    return next.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return "—";
+  }
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+export function HealthReportPage() {
+  const [report, setReport] = useState<HealthReport | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | undefined>(undefined);
+  const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
+  // userId is resolved once from the seed endpoint on first load.
+  // In production, replace seedAndGetUserId() with your auth context (e.g. useAuth().user.id).
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const load = useCallback(async (month?: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Resolve userId: use cached value or seed the DB to get one
+      let uid = userId;
+      if (!uid) {
+        uid = await seedAndGetUserId();
+        setUserId(uid);
+      }
+      const data = await fetchHealthReport(uid, month);
+      setReport(data);
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
+      setError({ message: apiErr.message ?? "Unknown error", status: apiErr.status });
+    } finally {
+      setLoading(false);
+    }
+  // userId intentionally omitted — we read it via the setter pattern above
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    load(selectedMonth);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-fetch when month filter changes (skip on mount — handled above)
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    load(selectedMonth);
+  }, [selectedMonth, load]);
+
+  // ── Derived display values ─────────────────────────────────────────────────
+
+  const summary = useMemo(() => {
+    if (!report) return [];
+    const { cycleSummary } = report;
+    const nextPeriod = cycleSummary.estimatedNextPeriod
+      ? formatDate(cycleSummary.estimatedNextPeriod)
+      : "—";
+    const ovWindow = cycleSummary.ovulationWindow ?? "—";
+    return [
+      { label: "Cycle Length", value: `${cycleSummary.cycleLength} Days`, color: "bg-rose-50 text-rose-600", icon: "🌸" },
+      { label: "Period Duration", value: `${cycleSummary.periodDuration} Days`, color: "bg-amber-50 text-amber-600", icon: "💧" },
+      { label: "Estimated Next Period", value: nextPeriod, color: "bg-purple-50 text-purple-600", icon: "📅" },
+      { label: "Ovulation Window", value: ovWindow, color: "bg-blue-50 text-blue-600", icon: "🔵" },
+    ];
+  }, [report]);
+
+  const flowChartData = useMemo(() => {
+    if (!report) return [];
+    return report.flowChartData ?? [];
+  }, [report]);
+
+  const donutItems = useMemo(() => {
+    if (!report?.donuts?.length) return [];
+    // API provides colors directly; fall back to our palette if missing
+    return report.donuts.slice(0, 6).map((item, i) => ({
+      value: Math.round(item.percentage),
+      label: item.label,
+      color: item.color || DONUT_COLORS[i % DONUT_COLORS.length],
+    }));
+  }, [report]);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
+  if (loading) return <HealthReportSkeleton />;
+  if (error) return <ErrorState error={error} onRetry={() => { setUserId(null); load(selectedMonth); }} />;
+  if (!report) return null;
+
+  const { cycleSummary, flowSummary, historicalCycles } = report;
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Cycle Summary */}
+
+        {/* ── Cycle Summary ─────────────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold mb-4">Cycle Summary - October 2025</h2>
+          <h2 className="font-semibold mb-4">
+            Cycle Summary{cycleSummary.label ? ` — ${cycleSummary.label}` : ""}
+          </h2>
           <div className="flex flex-wrap gap-2">
             {summary.map((s) => (
-              <div key={s.label} className={`${s.color} px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5`}>
+              <div
+                key={s.label}
+                className={`${s.color} px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5`}
+              >
                 <span>{s.icon}</span>
                 <span className="opacity-70">{s.label}:</span>
                 <span className="font-semibold">{s.value}</span>
@@ -91,86 +334,141 @@ export function HealthReportPage() {
           </div>
         </div>
 
-        {/* Flow & Symptom Summary */}
+        {/* ── Flow & Symptom Summary ────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
           <h2 className="font-semibold">Flow & Symptom Summary</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Understand your symptoms linked to sleep & activity</p>
-          <p className="text-xs text-foreground/80 mt-3 leading-relaxed">
-            Your average cycle length is 28 days. PMS symptoms were more frequent this month. Flow pattern remains within a typical range.
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Understand your symptoms linked to sleep & activity
           </p>
-          <p className="text-xs font-semibold text-primary mt-3">Tips To Adhere To:</p>
-          <ul className="text-xs text-foreground/80 space-y-1 mt-1 list-disc list-inside">
-            <li>Low sleep nights → higher cramp scores</li>
-            <li>Low hydration → increased bloating</li>
-          </ul>
+          <p className="text-xs text-foreground/80 mt-3 leading-relaxed">
+            {flowSummary?.narrative ||
+              `Your average cycle length is ${cycleSummary.cycleLength} days. Flow pattern remains within a typical range.`}
+          </p>
+          {flowSummary?.tips?.length > 0 && (
+            <>
+              <p className="text-xs font-semibold text-primary mt-3">Tips To Adhere To:</p>
+              <ul className="text-xs text-foreground/80 space-y-1 mt-1 list-disc list-inside">
+                {flowSummary.tips.map((tip, i) => (
+                  <li key={i}>{tip}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
 
-        {/* Period Length chart */}
+        {/* ── Period Length Chart ───────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
           <h2 className="font-semibold">Period Length</h2>
-          <p className="text-xs text-muted-foreground">Monthly period pattern (0–7 days) and flow intensity</p>
-          <div className="mt-3"><LineChart /></div>
-          <p className="text-[10px] text-muted-foreground mt-2">↑ Higher peaks indicate stronger symptoms. Plateaus (yellow lines) show heavier days.</p>
+          <p className="text-xs text-muted-foreground">
+            Flow intensity over the cycle (0–10 scale)
+          </p>
+          <div className="mt-3">
+            <LineChart data={flowChartData} />
+            {/* <LineChart data={flowChartData} startDate={cycleSummary.startDate ?? undefined} /> */}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2">
+            ↑ Higher peaks indicate stronger symptoms. Plateaus show heavier days.
+          </p>
         </div>
 
-        {/* Symptom Frequency */}
+        {/* ── Symptom Frequency ─────────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
           <h2 className="font-semibold">Symptom Frequency</h2>
-          <p className="text-xs text-muted-foreground">Study your body system & understand your wellbeing</p>
-          <div className="grid grid-cols-3 gap-3 mt-4">
-            <Donut value={55} label="Physical Pain" color="oklch(0.65 0.22 0)" />
-            <Donut value={75} label="Mood & Mental" color="oklch(0.6 0.22 320)" />
-            <Donut value={82} label="Digestion & Appetite" color="oklch(0.7 0.18 140)" />
-            <Donut value={33} label="Sexual Health" color="oklch(0.7 0.22 30)" />
-            <Donut value={22} label="Digestion & Appetite" color="oklch(0.7 0.22 60)" />
-            <Donut value={60} label="Sleep" color="oklch(0.6 0.22 270)" />
-          </div>
+          <p className="text-xs text-muted-foreground">
+            Study your body system & understand your wellbeing
+          </p>
+          {donutItems.length > 0 ? (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {donutItems.map((d, i) => (
+                <Donut key={i} value={d.value} label={d.label} color={d.color} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-4 italic">No symptom data logged yet.</p>
+          )}
         </div>
       </div>
 
-      {/* Historical Cycle Data */}
+      {/* ── Historical Cycle Data ──────────────────────────────────────────── */}
       <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
             <h2 className="font-semibold">Historical Cycle Data</h2>
-            <button className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
-              Oct 2025 <ChevronDown className="size-3" />
-            </button>
+            <div className="relative inline-block">
+              <button
+                onClick={() => setMonthDropdownOpen((v) => !v)}
+                className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
+              >
+                {selectedMonth ?? cycleSummary.label ?? "All months"}
+                <ChevronDown className={`size-3 transition-transform ${monthDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+              {monthDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-border/60 z-10 min-w-[140px]">
+                  {[undefined, "Oct 2025", "Sep 2025", "Aug 2025"].map((m, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setSelectedMonth(m); setMonthDropdownOpen(false); }}
+                      className="block w-full text-left text-xs px-3 py-2 hover:bg-rose-50 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                    >
+                      {m ?? "All months"}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold">
+          <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity">
             <Download className="size-3.5" /> Download PDF
           </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-left text-muted-foreground border-b border-border">
-                <th className="py-2 font-medium">Date</th>
-                <th className="py-2 font-medium">Top Symptom</th>
-                <th className="py-2 font-medium text-right">Total Symptoms</th>
-                <th className="py-2 font-medium text-right">Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="border-b border-border/50 last:border-0">
-                  <td className="py-3">
-                    <div className="font-medium">{r.date}</div>
-                    <div className="text-[10px] text-muted-foreground">{r.time}</div>
-                  </td>
-                  <td className="py-3">{r.symptom}</td>
-                  <td className="py-3 text-right">{r.total}</td>
-                  <td className="py-3 text-right">
-                    <span className="inline-flex items-center gap-1">
-                      {r.note} <FileText className="size-3 text-muted-foreground" />
-                    </span>
-                  </td>
+
+        {historicalCycles?.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-muted-foreground border-b border-border">
+                  <th className="py-2 font-medium">Date</th>
+                  <th className="py-2 font-medium">Top Symptom</th>
+                  <th className="py-2 font-medium text-right">Total Symptoms</th>
+                  <th className="py-2 font-medium text-right">Note</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {historicalCycles.map((row, i) => (
+                  <tr key={i} className="border-b border-border/50 last:border-0">
+                    <td className="py-3">
+                      <div className="font-medium">{formatDate(row.date)}</div>
+                    </td>
+                    <td className="py-3">{row.topSymptom || "—"}</td>
+                    <td className="py-3 text-right">{row.totalSymptoms ?? "—"}</td>
+                    <td className="py-3 text-right">
+                      {row.note ? (
+                        <span className="inline-flex items-center gap-1">
+                          {row.note} <FileText className="size-3 text-muted-foreground" />
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground italic py-4 text-center">
+            No historical cycle records found.
+          </p>
+        )}
       </div>
+
+      {/* shimmer keyframe (shared with skeleton, harmless if duplicate) */}
+      <style>{`
+        @keyframes skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </div>
   );
 }
