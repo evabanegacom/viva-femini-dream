@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import React from "react";
+import { GlobalLoader } from "@/components/global-loader";
 
 function NotFoundComponent() {
   return (
@@ -83,7 +85,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <React.Suspense fallback={<GlobalLoader />}>
       <Outlet />
+      </React.Suspense>
     </QueryClientProvider>
   );
 }
