@@ -1,11 +1,11 @@
-interface ApiDonut {
+export interface ApiDonut {
   key: string;
   label: string;
   percentage: number;
   color: string;
 }
 
-interface ApiResponse {
+export interface ApiResponse {
   success: boolean;
   data: {
     userId: string;
@@ -26,7 +26,7 @@ interface ApiResponse {
       narrative: string;
       tips: string[];
     };
-    periodLengthChart: number[];
+    periodLengthChart: ChartPoint[];
     symptomFrequency: {
       donuts: ApiDonut[];
       breakdown: unknown[];
@@ -41,8 +41,12 @@ interface ApiResponse {
   };
 }
 
+export interface ChartPoint {
+  date: string;
+  flowIntensity: number;
+}
 // Normalised shape used internally by the component
-interface HealthReport {
+export interface HealthReport {
   cycleSummary: {
     cycleLength: number;
     periodDuration: number;
@@ -64,10 +68,10 @@ interface HealthReport {
     flowIntensity?: number;
     note?: string;
   }>;
-  flowChartData: number[];
+  flowChartData: ChartPoint[];
 }
 
-interface ApiError {
+export interface ApiError {
   message: string;
   status?: number;
 }

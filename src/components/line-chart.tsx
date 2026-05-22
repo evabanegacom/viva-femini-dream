@@ -1,7 +1,4 @@
-interface ChartPoint {
-  date: string;
-  flowIntensity: number;
-}
+import { ChartPoint } from "@/types/health-report-types";
 
 function LineChart({
   data,
