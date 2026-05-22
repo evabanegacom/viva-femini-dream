@@ -1,6 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { Home, Heart, FileText } from "lucide-react";
+import profilePic from "@/assets/profile-image.svg";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -10,7 +11,8 @@ const tabs = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-6">
@@ -18,8 +20,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-pink-400 flex items-center justify-center text-primary-foreground font-bold shrink-0">
-              E
+            <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary to-pink-400 flex items-center justify-center text-primary-foreground font-bold shrink-0">
+              <img src={profilePic} alt="Profile" className="h-full w-full rounded-full object-cover" />
             </div>
             <div className="min-w-0">
               <p className="text-xs text-muted-foreground truncate">Good Morning ☀️</p>
