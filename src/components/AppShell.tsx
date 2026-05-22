@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { Home, Heart, FileText } from "lucide-react";
 import profilePic from "@/assets/profile-image.svg";
@@ -11,7 +11,8 @@ const tabs = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useLocation();
+  const pathname = location.pathname;
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-6">

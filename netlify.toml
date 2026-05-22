@@ -1,8 +1,0 @@
-[[edge_functions]]
-  function = "og-meta"
-  path = "/product/*"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

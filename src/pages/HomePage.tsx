@@ -1,16 +1,15 @@
 import {
-  ChevronDown, ChevronUp, Heart, Flame, Sparkles, X,
-  ChevronRight, Activity, TrendingUp, Droplet, FileText, Loader2
+  ChevronDown, ChevronUp, Heart, Sparkles, X,
+  ChevronRight, Activity, TrendingUp, Droplet, FileText,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { seedUserIdQueryOptions } from "@/queries/health-report";
+import { seedUserIdQueryOptions, healthReportQueryOptions } from "@/queries/health-report";
 import { cyclesQueryOptions } from "@/queries/cycles";
 import { symptomLogsQueryOptions } from "@/queries/symptoms";
-import { healthReportQueryOptions } from "@/queries/health-report";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const DAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -24,11 +23,8 @@ function buildCalendarCells(year: number, month: number) {
   return cells;
 }
 
-function parseDaySet(dateStrings: string[]): Set<number> {
-  return new Set(dateStrings.map((d) => new Date(d).getDate()));
-}
-
 function formatDate(dateStr: string) {
+  if (!dateStr) return "—";
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
@@ -36,37 +32,35 @@ function daysBetween(from: string, to: string) {
   return Math.ceil((new Date(to).getTime() - new Date(from).getTime()) / 86400000);
 }
 
-// ── Skeleton ─────────────────────────────────────────────────────────────────
+// ── Skeleton ──────────────────────────────────────────────────────────────────
 
 function Skeleton({ className }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-xl bg-rose-100/60", className)} />;
+}
+
+function CardLoader() {
   return (
-    <div className={cn("animate-pulse rounded-2xl bg-white/30", className)} />
+    <div className="space-y-3 p-1">
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
   );
 }
 
-// ── Calendar ─────────────────────────────────────────────────────────────────
-
-interface CalendarProps {
-  expanded: boolean;
-  onToggle: () => void;
-  cycleDay: number;
-  monthLabel: string;
-  year: number;
-  month: number;
-  periodDays: Set<number>;
-  ovulationDays: Set<number>;
-  todayDate: number;
-  avgCycleLength: number;
-  nextPeriodDate: string;
-  fertileWindowStart: string;
-  isLoading: boolean;
-}
+// ── Calendar ──────────────────────────────────────────────────────────────────
 
 function Calendar({
   expanded, onToggle, cycleDay, monthLabel, year, month,
   periodDays, ovulationDays, todayDate, avgCycleLength,
   nextPeriodDate, fertileWindowStart, isLoading,
-}: CalendarProps) {
+}: {
+  expanded: boolean; onToggle: () => void; cycleDay: number;
+  monthLabel: string; year: number; month: number;
+  periodDays: Set<number>; ovulationDays: Set<number>;
+  todayDate: number; avgCycleLength: number;
+  nextPeriodDate: string; fertileWindowStart: string; isLoading: boolean;
+}) {
   const cells = useMemo(() => buildCalendarCells(year, month), [year, month]);
   const daysUntilNext = nextPeriodDate ? daysBetween(new Date().toISOString().split("T")[0], nextPeriodDate) : null;
   const cyclePercent = avgCycleLength ? Math.round((cycleDay / avgCycleLength) * 100) : 0;
@@ -91,8 +85,8 @@ function Calendar({
 
         {isLoading ? (
           <div className="grid grid-cols-7 gap-1.5">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-full" />
+            {Array.from({ length: 35 }).map((_, i) => (
+              <div key={i} className="aspect-square rounded-full bg-white/20 animate-pulse" />
             ))}
           </div>
         ) : expanded ? (
@@ -103,16 +97,13 @@ function Calendar({
               const isPeriod = periodDays.has(d);
               const isOv = ovulationDays.has(d);
               return (
-                <div
-                  key={i}
-                  className={cn(
-                    "aspect-square rounded-full flex items-center justify-center text-xs font-medium border",
-                    isToday && "bg-white text-rose-500 border-white shadow",
-                    !isToday && isPeriod && "bg-rose-600/70 text-white border-transparent",
-                    !isToday && isOv && "bg-blue-600 text-white border-transparent",
-                    !isToday && !isPeriod && !isOv && "border-white/30 text-white/90"
-                  )}
-                >
+                <div key={i} className={cn(
+                  "aspect-square rounded-full flex items-center justify-center text-xs font-medium border",
+                  isToday && "bg-white text-rose-500 border-white shadow",
+                  !isToday && isPeriod && "bg-rose-600/70 text-white border-transparent",
+                  !isToday && isOv && "bg-blue-600 text-white border-transparent",
+                  !isToday && !isPeriod && !isOv && "border-white/30 text-white/90"
+                )}>
                   {d}
                 </div>
               );
@@ -121,40 +112,44 @@ function Calendar({
         ) : (
           <div className="grid grid-cols-7 gap-1.5">
             {cells.filter(Boolean).slice(0, 7).map((d, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "aspect-square rounded-full flex items-center justify-center text-xs font-medium border",
-                  d === todayDate ? "bg-white text-rose-500 border-white" : "border-white/30 text-white/90"
-                )}
-              >
+              <div key={i} className={cn(
+                "aspect-square rounded-full flex items-center justify-center text-xs font-medium border",
+                d === todayDate ? "bg-white text-rose-500 border-white" : "border-white/30 text-white/90"
+              )}>
                 {d}
               </div>
             ))}
           </div>
         )}
 
-        <div className="bg-white text-foreground rounded-2xl mt-5 p-5 text-center relative">
+        {/* Cycle info card */}
+        <div className="bg-white text-foreground rounded-2xl mt-5 p-5 text-center">
           <p className="text-xs text-muted-foreground mb-1">Today is Cycle Day</p>
           {isLoading ? (
-            <Skeleton className="mx-auto size-16 rounded-full bg-rose-100" />
-          ) : (
-            <div className="mx-auto size-16 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 text-white flex items-center justify-center text-2xl font-bold shadow-md">
-              {cycleDay}
+            <div className="flex flex-col items-center gap-2">
+              <div className="mx-auto size-16 rounded-full bg-rose-100 animate-pulse" />
+              <Skeleton className="h-3 w-48 mx-auto" />
+              <Skeleton className="h-3 w-36 mx-auto" />
             </div>
+          ) : (
+            <>
+              <div className="mx-auto size-16 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+                {cycleDay}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Avg. Cycle: {avgCycleLength} Days · Currently {cyclePercent}% complete
+              </p>
+              <div className="mt-3 flex items-center justify-center gap-2 text-xs">
+                <span className="px-3 py-1 rounded-full border border-rose-200 text-rose-500 font-medium">Next Period</span>
+                <span className="text-muted-foreground">
+                  {nextPeriodDate ? `${formatDate(nextPeriodDate)} (${daysUntilNext} Days)` : "—"}
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-2">
+                {fertileWindowStart ? `Fertile window starts ${fertileWindowStart}` : ""}
+              </p>
+            </>
           )}
-          <p className="text-xs text-muted-foreground mt-2">
-            Avg. Cycle: {avgCycleLength} Days · Currently {cyclePercent}% of 100
-          </p>
-          <div className="mt-3 flex items-center justify-center gap-2 text-xs">
-            <span className="px-3 py-1 rounded-full border border-rose-200 text-rose-500 font-medium">Next Period</span>
-            <span className="text-muted-foreground">
-              {nextPeriodDate ? `${formatDate(nextPeriodDate)} (${daysUntilNext} Days)` : "—"}
-            </span>
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-2">
-            {fertileWindowStart ? `Fertile window starts ${formatDate(fertileWindowStart)}` : ""}
-          </p>
         </div>
       </div>
     </div>
@@ -165,8 +160,7 @@ function Calendar({
 
 function CycleHighlight({ tips, cycleDay, isLoading }: {
   tips: { icon: string; title: string; body: string; note: string; bg: string }[];
-  cycleDay: number;
-  isLoading: boolean;
+  cycleDay: number; isLoading: boolean;
 }) {
   return (
     <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
@@ -176,13 +170,18 @@ function CycleHighlight({ tips, cycleDay, isLoading }: {
           <p className="text-xs text-muted-foreground">Understand your cycle and take care during peak days</p>
         </div>
         <span className="text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap">
-          📅 Day {cycleDay} Tip
+          {isLoading ? "📅 Loading..." : `📅 Day ${cycleDay} Tip`}
         </span>
       </div>
       <div className="mt-4 flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[200px] flex-1 h-36" />
+            <div key={i} className="min-w-[200px] flex-1 rounded-2xl p-4 bg-rose-50 animate-pulse">
+              <div className="size-8 rounded-full bg-rose-200 mb-3" />
+              <Skeleton className="h-3 w-3/4 mb-2 bg-rose-200" />
+              <Skeleton className="h-3 w-full bg-rose-200" />
+              <Skeleton className="h-3 w-2/3 mt-1 bg-rose-200" />
+            </div>
           ))
         ) : (
           tips.map((t) => (
@@ -203,10 +202,8 @@ function CycleHighlight({ tips, cycleDay, isLoading }: {
 
 // ── Daily Check-Offs ──────────────────────────────────────────────────────────
 
-function DailyCheckoffs({ topSymptom, mostFrequent, isLoading }: {
-  topSymptom: string;
-  mostFrequent: string;
-  isLoading: boolean;
+function DailyCheckoffs({ topSymptom, mostFrequent, intensityChange, isLoading }: {
+  topSymptom: string; mostFrequent: string; intensityChange: string; isLoading: boolean;
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -215,16 +212,11 @@ function DailyCheckoffs({ topSymptom, mostFrequent, isLoading }: {
           <Activity className="size-4 text-primary" />
           <h3 className="font-semibold text-sm">Daily Check-Offs</h3>
         </div>
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full bg-rose-50" />
-            <Skeleton className="h-4 w-3/4 bg-rose-50" />
-          </div>
-        ) : (
+        {isLoading ? <CardLoader /> : (
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Top Symptom Today</span>
-              <span className="text-rose-500 font-medium">{topSymptom || "None logged"}</span>
+              <span className="text-rose-500 font-medium">{topSymptom}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Health Report</span>
@@ -238,22 +230,19 @@ function DailyCheckoffs({ topSymptom, mostFrequent, isLoading }: {
           <TrendingUp className="size-4 text-emerald-500" />
           <h3 className="font-semibold text-sm">Trend Watch</h3>
         </div>
-        {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full bg-rose-50" />
-            <Skeleton className="h-4 w-3/4 bg-rose-50" />
-          </div>
-        ) : (
+        {isLoading ? <CardLoader /> : (
           <div className="space-y-2 text-xs">
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Most Frequent Symptom</span>
               <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-500 font-medium">
-                {mostFrequent || "—"}
+                {mostFrequent}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Symptom Intensity</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 font-medium">Stable ↘</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 font-medium">
+                {intensityChange}
+              </span>
             </div>
           </div>
         )}
@@ -277,18 +266,14 @@ function ReferAndQuiz() {
             <p className="font-semibold text-sm">Refer your friends to VivaFemini 💕</p>
             <p className="text-xs text-muted-foreground mt-0.5">Gift your friend 30 days of free Premium to help them thrive</p>
           </div>
-          <button onClick={() => setShowRefer(false)} className="text-muted-foreground">
-            <X className="size-4" />
-          </button>
+          <button onClick={() => setShowRefer(false)} className="text-muted-foreground"><X className="size-4" /></button>
         </div>
       )}
       {showQuiz && (
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-border/50">
           <div className="flex items-start justify-between gap-3 mb-3">
             <p className="font-semibold text-sm">Hi! Did you take your pregnancy test?</p>
-            <button onClick={() => setShowQuiz(false)} className="text-muted-foreground">
-              <X className="size-4" />
-            </button>
+            <button onClick={() => setShowQuiz(false)} className="text-muted-foreground"><X className="size-4" /></button>
           </div>
           <div className="grid grid-cols-4 gap-2 text-[11px]">
             {["Didn't take test", "Positive", "Faint line", "Negative"].map((o) => (
@@ -305,9 +290,7 @@ function ReferAndQuiz() {
               </button>
             ))}
           </div>
-          <button className="mt-3 w-full bg-primary text-primary-foreground rounded-full py-2 text-xs font-semibold">
-            Apply
-          </button>
+          <button className="mt-3 w-full bg-primary text-primary-foreground rounded-full py-2 text-xs font-semibold">Apply</button>
         </div>
       )}
       <div>
@@ -331,16 +314,23 @@ function ReferAndQuiz() {
 
 // ── Recommended ───────────────────────────────────────────────────────────────
 
-const ARTICLES = [
-  { title: "5 Ways to Reduce Stress During Your Cycle", img: "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=400&q=70" },
-  { title: "Best Nutrition Tips for Better Energy", img: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=70" },
-  { title: "How Sleep Affects Hormonal Balance", img: "https://images.unsplash.com/photo-1520206183501-b80df61043c2?w=400&q=70" },
-];
+function Recommended({ narrative, isLoading }: { narrative: string; isLoading: boolean }) {
+  // Articles are editorial content — not from the health API
+  const ARTICLES = [
+    { title: "5 Ways to Reduce Stress During Your Cycle", img: "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=400&q=70" },
+    { title: "Best Nutrition Tips for Better Energy", img: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=70" },
+    { title: "How Sleep Affects Hormonal Balance", img: "https://images.unsplash.com/photo-1520206183501-b80df61043c2?w=400&q=70" },
+  ];
 
-function Recommended() {
   return (
     <div>
-      <h2 className="text-primary font-semibold mb-3">Recommended for You</h2>
+      <h2 className="text-primary font-semibold mb-1">Recommended for You</h2>
+      {/* Dynamic narrative from health report */}
+      {isLoading ? (
+        <Skeleton className="h-3 w-2/3 mb-3" />
+      ) : narrative ? (
+        <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{narrative}</p>
+      ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {ARTICLES.map((it) => (
           <article key={it.title} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border/50">
@@ -358,11 +348,11 @@ function Recommended() {
   );
 }
 
-// ── Cycle tips mapped by phase ────────────────────────────────────────────────
+// ── Phase-aware tips (derived from cycle day from API) ────────────────────────
 
 function getTipsForCycleDay(day: number) {
   if (day <= 5) return [
-    { icon: "🍵", title: "Stay Comfortable", body: "On heavy flow days, prioritize comfort. Stay hydrated and use heating pads for abdominal relief.", bg: "bg-[oklch(0.94_0.05_350)]", note: "Listen to your body" },
+    { icon: "🍵", title: "Stay Comfortable", body: "On heavy flow days, prioritize comfort. Stay hydrated and use heating pads for relief.", bg: "bg-[oklch(0.94_0.05_350)]", note: "Listen to your body" },
     { icon: "💧", title: "Stay Hydrated", body: "Drink 2L of water daily to ease cramps and support your health.", bg: "bg-[oklch(0.94_0.05_175)]", note: "8 glasses/day" },
     { icon: "🧘", title: "Gentle Movement", body: "Light stretching or yoga can ease discomfort and lift mood.", bg: "bg-[oklch(0.94_0.05_60)]", note: "Listen to your body" },
   ];
@@ -395,7 +385,7 @@ export function HomePage() {
   const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   const todayStr = now.toISOString().split("T")[0];
 
-  // ── Data fetching ───────────────────────────────────────────────────────────
+  // ── Queries ─────────────────────────────────────────────────────────────────
 
   const { data: userId } = useQuery(seedUserIdQueryOptions());
 
@@ -409,26 +399,30 @@ export function HomePage() {
     enabled: !!userId,
   });
 
-  const { data: todayLog, isLoading: isLoadingToday } = useQuery({
+  const { data: symptomLogs, isLoading: isLoadingSymptoms } = useQuery({
     ...symptomLogsQueryOptions(userId ?? ""),
     enabled: !!userId,
   });
 
-  // ── Derived values ──────────────────────────────────────────────────────────
+  const isLoading = isLoadingCycles || isLoadingReport || isLoadingSymptoms;
+
+  // ── Derived values from API data ────────────────────────────────────────────
 
   const activeCycle = cycles?.[0];
 
-  // Cycle day = days since cycle start
+  // Cycle day — how many days since period started
   const cycleDay = useMemo(() => {
     if (!activeCycle?.startDate) return 1;
     return Math.max(1, daysBetween(activeCycle.startDate, todayStr) + 1);
   }, [activeCycle, todayStr]);
 
-  // Period days and ovulation days from cycle data
+  // Mark period days on calendar from cycle start/end dates
   const periodDays = useMemo(() => {
     if (!activeCycle?.startDate) return new Set<number>();
     const start = new Date(activeCycle.startDate);
-    const end = activeCycle.endDate ? new Date(activeCycle.endDate) : new Date(start.getTime() + 5 * 86400000);
+    const end = activeCycle.endDate
+      ? new Date(activeCycle.endDate)
+      : new Date(start.getTime() + 5 * 86400000);
     const days = new Set<number>();
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       if (d.getMonth() === month) days.add(d.getDate());
@@ -436,6 +430,7 @@ export function HomePage() {
     return days;
   }, [activeCycle, month]);
 
+  // Mark ovulation window — typically 14 days before end of cycle
   const ovulationDays = useMemo(() => {
     if (!activeCycle?.startDate || !activeCycle?.cycleLength) return new Set<number>();
     const ovStart = new Date(activeCycle.startDate);
@@ -449,24 +444,35 @@ export function HomePage() {
     return days;
   }, [activeCycle, month]);
 
-  const avgCycleLength = report?.cycleSummary?.cycleLength ?? activeCycle?.cycleLength ?? 28;
+  // All values from API — no fallback hardcoded strings
+  const avgCycleLength = report?.cycleSummary?.cycleLength ?? activeCycle?.cycleLength ?? 0;
   const nextPeriodDate = report?.cycleSummary?.estimatedNextPeriod ?? "";
-  const fertileWindowStart = report?.cycleSummary?.ovulationWindow?.split("–")[0]?.trim() ?? "";
-
-  // Today's top symptom from logs
-  const topSymptom = useMemo(() => {
-    if (!Array.isArray(todayLog)) return "—";
-    const todayEntry = (todayLog as any[]).find((l: any) => l.date?.startsWith(todayStr));
-    return todayEntry?.physicalSymptoms?.[0] ?? todayEntry?.moodSymptoms?.[0] ?? "None logged";
-  }, [todayLog, todayStr]);
-
-  // Most frequent symptom from health report donuts
+  const fertileWindowStart = report?.cycleSummary?.ovulationWindow ?? "";
+  const narrative = report?.flowSummary?.narrative ?? "";
   const mostFrequent = report?.donuts?.[0]?.label ?? "—";
 
-  // Tips based on cycle day
-  const tips = useMemo(() => getTipsForCycleDay(cycleDay), [cycleDay]);
+  // Intensity change derived from donut percentages
+  const intensityChange = useMemo(() => {
+    if (!report?.donuts?.length) return "—";
+    const top = report.donuts[0];
+    return top.percentage > 60 ? "High ↑" : top.percentage > 30 ? "Moderate →" : "Stable ↘";
+  }, [report]);
 
-  const isLoading = isLoadingCycles || isLoadingReport || isLoadingToday;
+  // Today's top symptom from symptom logs
+  const topSymptom = useMemo(() => {
+    if (!Array.isArray(symptomLogs)) return "—";
+    const todayEntry = (symptomLogs as any[]).find((l: any) => l.date?.startsWith(todayStr));
+    if (!todayEntry) return "None logged";
+    return (
+      todayEntry.physicalSymptoms?.[0] ??
+      todayEntry.moodSymptoms?.[0] ??
+      todayEntry.periodIndicators?.[0] ??
+      "None logged"
+    );
+  }, [symptomLogs, todayStr]);
+
+  // Tips derived from cycle day (which comes from API cycle data)
+  const tips = useMemo(() => getTipsForCycleDay(cycleDay), [cycleDay]);
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -492,8 +498,13 @@ export function HomePage() {
       </div>
       <div className="lg:col-span-7 space-y-4">
         <CycleHighlight tips={tips} cycleDay={cycleDay} isLoading={isLoading} />
-        <DailyCheckoffs topSymptom={topSymptom} mostFrequent={mostFrequent} isLoading={isLoading} />
-        <Recommended />
+        <DailyCheckoffs
+          topSymptom={topSymptom}
+          mostFrequent={mostFrequent}
+          intensityChange={intensityChange}
+          isLoading={isLoading}
+        />
+        <Recommended narrative={narrative} isLoading={isLoading} />
       </div>
     </div>
   );
