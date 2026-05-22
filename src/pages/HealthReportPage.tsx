@@ -166,75 +166,74 @@ export function HealthReportPage() {
 
       {/* ── Historical Cycle Data ──────────────────────────────────────────── */}
       <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div>
-            <h2 className="font-semibold">Historical Cycle Data</h2>
-            <div className="relative inline-block">
+  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div>
+      <h2 className="font-semibold">Historical Cycle Data</h2>
+      <div className="relative inline-block">
+        <button
+          onClick={() => setMonthDropdownOpen((v) => !v)}
+          className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
+        >
+          {selectedMonth ?? cycleSummary.label ?? "All months"}
+          <ChevronDown className={`size-3 transition-transform ${monthDropdownOpen ? "rotate-180" : ""}`} />
+        </button>
+        {monthDropdownOpen && (
+          <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-border/60 z-10 min-w-[140px]">
+            {([undefined, "Oct 2025", "Sep 2025", "Aug 2025"] as const).map((m, i) => (
               <button
-                onClick={() => setMonthDropdownOpen((v) => !v)}
-                className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                key={i}
+                onClick={() => { setSelectedMonth(m); setMonthDropdownOpen(false); }}
+                className="block w-full text-left text-xs px-3 py-2 hover:bg-rose-50 transition-colors first:rounded-t-xl last:rounded-b-xl"
               >
-                {selectedMonth ?? cycleSummary.label ?? "All months"}
-                <ChevronDown className={`size-3 transition-transform ${monthDropdownOpen ? "rotate-180" : ""}`} />
+                {m ?? "All months"}
               </button>
-              {monthDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-border/60 z-10 min-w-[140px]">
-                  {([undefined, "Oct 2025", "Sep 2025", "Aug 2025"] as const).map((m, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setSelectedMonth(m); setMonthDropdownOpen(false); }}
-                      className="block w-full text-left text-xs px-3 py-2 hover:bg-rose-50 transition-colors first:rounded-t-xl last:rounded-b-xl"
-                    >
-                      {m ?? "All months"}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            ))}
           </div>
-          <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity">
-            <Download className="size-3.5" /> Download PDF
-          </button>
-        </div>
-
-        {historicalCycles?.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-left text-muted-foreground border-b border-border">
-                  <th className="py-2 font-medium">Date</th>
-                  <th className="py-2 font-medium">Top Symptom</th>
-                  <th className="py-2 font-medium text-right">Total Symptoms</th>
-                  <th className="py-2 font-medium text-right">Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {historicalCycles.map((row, i) => (
-                  <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-rose-50/50">
-                    <td className="py-3">
-                      <div className="font-medium">{formatDate(row.date)}</div>
-                    </td>
-                    <td className="py-3 font-medium text-foreground">{row.topSymptom || "—"}</td>
-                    <td className="py-3 text-right font-medium">{row.totalSymptoms ?? "—"}</td>
-                    <td className="py-3 text-right text-muted-foreground">
-                      {row.note ? (
-                        <span className="inline-flex items-center gap-1">
-                          {row.note}
-                          <FileText className="size-3" />
-                        </span>
-                      ) : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground italic py-8 text-center">
-            No historical cycle records found.
-          </p>
         )}
       </div>
+    </div>
+    <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity">
+      <Download className="size-3.5" /> Download PDF
+    </button>
+  </div>
+
+  {historicalCycles?.length > 0 ? (
+    <table className="w-full text-xs table-fixed">
+      <thead>
+        <tr className="text-left text-muted-foreground border-b border-border">
+          <th className="py-2 font-medium w-[30%]">Date</th>
+          <th className="py-2 font-medium w-[28%]">Top Symptom</th>
+          <th className="py-2 font-medium w-[20%] text-right">Total</th>
+          <th className="py-2 font-medium w-[22%] text-right">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {historicalCycles.map((row, i) => (
+          <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-rose-50/50">
+            <td className="py-3 pr-2">
+              <div className="font-medium">{formatDate(row.date)}</div>
+            </td>
+            <td className="py-3 pr-2 font-medium text-foreground truncate">{row.topSymptom || "—"}</td>
+            <td className="py-3 text-right font-medium">{row.totalSymptoms ?? "—"}</td>
+            <td className="py-3 text-right text-muted-foreground">
+              {row.note ? (
+                <span className="inline-flex items-center justify-end gap-1">
+                  <span className="truncate max-w-[50px]">{row.note}</span>
+                  <FileText className="size-3 shrink-0" />
+                </span>
+              ) : "—"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p className="text-xs text-muted-foreground italic py-8 text-center">
+      No historical cycle records found.
+    </p>
+  )}
+</div>
+      
     </div>
   );
 }
