@@ -2,10 +2,10 @@ import { Download, FileText, ChevronDown } from "lucide-react";
 import { useMemo } from "react";
 
 const summary = [
-  { label: "Cycle Length", value: "28 Days", color: "bg-rose-50 text-rose-600", icon: "🌸" },
-  { label: "Period Duration", value: "6 Days", color: "bg-amber-50 text-amber-600", icon: "💧" },
-  { label: "Estimated Next Period", value: "Nov 1", color: "bg-purple-50 text-purple-600", icon: "📅" },
-  { label: "Ovulation Window", value: "Oct 17–22", color: "bg-blue-50 text-blue-600", icon: "🔵" },
+  { label: "Cycle Length", value: "28 Days", borderColor:'#F36F56', color: "bg-rose-50 text-rose-600", icon: "🌸" },
+  { label: "Period Duration", value: "6 Days", borderColor: '#FB3179', color: "bg-amber-50 text-amber-600", icon: "💧" },
+  { label: "Estimated Next Period", value: "Nov 1", borderColor: '#7E19DF', color: "bg-purple-50 text-purple-600", icon: "📅" },
+  { label: "Ovulation Window", value: "Oct 17-22", borderColor: '#0D34F9', color: "bg-blue-50 text-blue-600", icon: "🔵" },
 ];
 
 const chartData = [3, 4, 6, 8, 5, 7, 9, 7, 6, 4, 5, 3, 2];
@@ -79,7 +79,7 @@ export function HealthReportPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Cycle Summary */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold mb-4">Cycle Summary – October 2025</h2>
+          <h2 className="font-semibold mb-4">Cycle Summary - October 2025</h2>
           <div className="flex flex-wrap gap-2">
             {summary.map((s) => (
               <div key={s.label} className={`${s.color} px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5`}>
