@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { AlertCircle, Activity, ChevronRight, Droplet, FileText, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
+import { AlertCircle, Activity, ChevronRight, CalendarCheck, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
 import closeIcon from "@/assets/close-icon.svg";
 import megaphone from "@/assets/megaphone.svg";
@@ -29,22 +29,26 @@ export function CycleHighlight({ tips, cycleDay, isLoading, error, onRetry }: {
   tips: { icon: string; title: string; body: string; note: string; bg: string }[];
   cycleDay: number; isLoading: boolean; error?: Error | null; onRetry?: () => void;
 }) {
+  console.log({tips})
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-      <div className="flex items-start justify-between gap-2 mb-1">
+    <div className="bg-white rounded-3xl p-5 md:p-3 shadow-sm border border-border/50">
+      <div className="flex items-center text-center flex-col justify-center gap-2 mb-1">
         <div>
-          <h2 className="text-primary font-semibold">Cycle Highlight</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="font-bold text-xl text-[#FB3179]">Cycle Highlight</h2>
+          <p className="text-sm w-65 text-[#0F172A] text-center">
             Understand your cycle and take care during peak days
           </p>
         </div>
-        <span className="text-[11px] px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium whitespace-nowrap shrink-0">
+        <span className="text-xs px-3 py-1.5 rounded-full bg-[#FFABC938] text-[#FB3179] font-bold whitespace-nowrap shrink-0">
           {isLoading ? (
             <span className="flex items-center gap-1">
               <Loader2 className="size-3 animate-spin" /> Loading...
             </span>
           ) : (
-            `📅 Day ${cycleDay} Tip`
+            <div className="flex items-center gap-1">
+              <CalendarCheck className="size-3 text-[#FB3179]" />
+              <span>Day {cycleDay}</span>
+            </div>
           )}
         </span>
       </div>
@@ -63,12 +67,14 @@ export function CycleHighlight({ tips, cycleDay, isLoading, error, onRetry }: {
                 </div>
               ))
             : tips.map((t) => (
-                <div key={t.title} className={cn("min-w-[200px] flex-1 snap-start rounded-2xl p-4", t.bg)}>
+                <div 
+                style={{ background: t.bg }}
+                key={t.title} className={cn("min-w-50 flex-1 snap-start rounded-2xl p-4", t.bg)}>
                   <div className="text-2xl mb-2">{t.icon}</div>
-                  <h3 className="font-semibold text-sm mb-1">{t.title}</h3>
-                  <p className="text-xs text-foreground/70 leading-relaxed">{t.body}</p>
-                  <div className="mt-3 flex items-center gap-1 text-xs text-primary font-medium">
-                    <Heart className="size-3 fill-primary" /> {t.note}
+                  <h3 className="font-semibold text-lg mb-1">{t.title}</h3>
+                  <p className="text-base text-[#0F172A] leading-relaxed">{t.body}</p>
+                  <div className="mt-3 bg-white rounded-4xl p-3 flex items-center gap-1 text-xs text-primary font-medium">
+                    <span className='text-[#000000] font-lighter'>💜{t?.note}</span>
                   </div>
                 </div>
               ))}
