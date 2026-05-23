@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <Icon className="size-4" />
-                  <span className={cn(active ? "inline" : "hidden")}>{label}</span>
+                  <span className={cn(active ? "inline text-center" : "hidden")}>{label}</span>
                 </span>
                 {!active && <span>{label}</span>}
               </Link>

@@ -5,7 +5,9 @@ import { seedUserIdQueryOptions, healthReportQueryOptions } from "@/queries/heal
 import { cyclesQueryOptions } from "@/queries/cycles";
 import { symptomLogsQueryOptions } from "@/queries/symptoms";
 import Calendar from "@/pages/home-page/calendar";
-import { ReferAndQuiz, CycleHighlight, DailyCheckoffs, Recommended } from "./shared";
+import { ReferAndQuiz, DailyCheckoffs } from "./shared";
+import { CycleHighlight } from "./cycle-cards";
+import { Recommended } from "./recommended";
 
 export function HomePage() {
   const [expanded, setExpanded] = useState(true);
@@ -146,16 +148,24 @@ export function HomePage() {
 
   // Today's top symptom from today's log entry
   const topSymptom = useMemo(() => {
-    if (!Array.isArray(symptomLogs)) return "—";
-    const todayEntry = (symptomLogs as any[]).find((l: any) => l.date === todayStr);
-    if (!todayEntry) return "None logged";
-    return (
-      todayEntry.physicalSymptoms?.[0] ??
-      todayEntry.moodSymptoms?.[0]     ??
-      todayEntry.periodIndicators?.[0] ??
-      "None logged"
-    );
-  }, [symptomLogs, todayStr]);
+  const logs = Array.isArray(symptomLogs)
+    ? symptomLogs
+    : (symptomLogs as any)?.data;
+
+  if (!Array.isArray(logs)) return "—";
+
+  const todayEntry = logs.find((l: any) => l.date === todayStr);
+  if (!todayEntry) return "None logged";
+
+  return (
+    todayEntry.physicalSymptoms?.[0] ??
+    todayEntry.moodSymptoms?.[0]     ??
+    todayEntry.periodIndicators?.[0] ??
+    "None logged"
+  );
+}, [symptomLogs, todayStr]);
+
+  console.log({ symptomLogs, topSymptom });
 
   const tips = useMemo(() => getTipsForCycleDay(cycleDay), [cycleDay]);
 
@@ -188,7 +198,7 @@ export function HomePage() {
       </div>
 
       {/* ── Right column ──────────────────────────────────────────────── */}
-      <div className="lg:col-span-7 space-y-4">
+<div className="px-2 lg:px-0 lg:col-span-7 space-y-4">
         <CycleHighlight
           tips={tips}
           cycleDay={cycleDay}
