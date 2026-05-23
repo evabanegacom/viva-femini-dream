@@ -84,6 +84,12 @@ export function HealthReportPage() {
   if (!report) return null;
 
   const { cycleSummary, flowSummary, historicalCycles } = report;
+  console.log({historicalCycles})
+
+  const historicalRows = useMemo(() => {
+  if (!historicalCycles?.length) return [];
+  return historicalCycles.flatMap((cycle: any) => cycle.rows ?? []);
+}, [historicalCycles]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -197,41 +203,44 @@ export function HealthReportPage() {
     </button>
   </div>
 
-  {historicalCycles?.length > 0 ? (
-    <table className="w-full text-xs table-fixed">
-      <thead>
-        <tr className="text-left text-muted-foreground border-b border-border">
-          <th className="py-2 font-medium w-[30%]">Date</th>
-          <th className="py-2 font-medium w-[28%]">Top Symptom</th>
-          <th className="py-2 font-medium w-[20%] text-right">Total</th>
-          <th className="py-2 font-medium w-[22%] text-right">Note</th>
+ {historicalRows.length > 0 ? (
+  <table className="w-full text-xs table-fixed">
+    <thead>
+      <tr className="text-left text-muted-foreground border-b border-border">
+        <th className="py-2 font-medium w-[30%]">Date</th>
+        <th className="py-2 font-medium w-[28%]">Top Symptom</th>
+        <th className="py-2 font-medium w-[20%] text-right">Total</th>
+        <th className="py-2 font-medium w-[22%] text-right">Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      {historicalRows.map((row: any, i: number) => (
+        <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-rose-50/50">
+          <td className="py-3 pr-2">
+            <div className="font-medium">{row.dateLabel}</div>
+            <div className="text-[10px] text-muted-foreground">{row.timeLabel}</div>
+          </td>
+          <td className="py-3 pr-2 font-medium text-foreground truncate">
+            {row.topSymptom || "—"}
+          </td>
+          <td className="py-3 text-right font-medium">{row.totalSymptomsScore ?? "—"}</td>
+          <td className="py-3 text-right text-muted-foreground">
+            {row.note ? (
+              <span className="inline-flex items-center justify-end gap-1">
+                <span className="truncate max-w-[50px]">{row.note}</span>
+                <FileText className="size-3 shrink-0" />
+              </span>
+            ) : "—"}
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        {historicalCycles.map((row, i) => (
-          <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-rose-50/50">
-            <td className="py-3 pr-2">
-              <div className="font-medium">{formatDate(row.date)}</div>
-            </td>
-            <td className="py-3 pr-2 font-medium text-foreground truncate">{row.topSymptom || "—"}</td>
-            <td className="py-3 text-right font-medium">{row.totalSymptoms ?? "—"}</td>
-            <td className="py-3 text-right text-muted-foreground">
-              {row.note ? (
-                <span className="inline-flex items-center justify-end gap-1">
-                  <span className="truncate max-w-[50px]">{row.note}</span>
-                  <FileText className="size-3 shrink-0" />
-                </span>
-              ) : "—"}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  ) : (
-    <p className="text-xs text-muted-foreground italic py-8 text-center">
-      No historical cycle records found.
-    </p>
-  )}
+      ))}
+    </tbody>
+  </table>
+) : (
+  <p className="text-xs text-muted-foreground italic py-8 text-center">
+    No historical cycle records found.
+  </p>
+)}
 </div>
       
     </div>

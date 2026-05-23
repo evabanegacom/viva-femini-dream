@@ -46,21 +46,35 @@ export interface ChartPoint {
   flowIntensity: number;
 }
 // Normalised shape used internally by the component
+
 export interface HealthReport {
   cycleSummary: {
+    label: string;
     cycleLength: number;
     periodDuration: number;
+
     estimatedNextPeriod: string | null;
+    nextPeriodDate: string | null;
+
     ovulationWindow: string | null;
-    label: string;
+    ovulationStartDate: string | null;
+    ovulationEndDate: string | null;
+
+    totalCycles: number;
+    shortestCycle: number;
+    longestCycle: number;
+
     startDate?: string | null;
   };
+
   flowSummary: {
     averageCycleLength: number;
     narrative: string;
     tips: string[];
   };
+
   donuts: ApiDonut[];
+
   historicalCycles: Array<{
     date: string;
     topSymptom?: string;
@@ -68,6 +82,7 @@ export interface HealthReport {
     flowIntensity?: number;
     note?: string;
   }>;
+
   flowChartData: ChartPoint[];
 }
 

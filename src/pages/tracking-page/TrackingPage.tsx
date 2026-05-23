@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
+import { Slider } from "@/components/slider";
 import { FileEdit, Check, Loader2 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { seedUserIdQueryOptions } from "@/queries/health-report";
