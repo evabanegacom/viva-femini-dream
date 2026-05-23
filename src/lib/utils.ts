@@ -27,25 +27,25 @@ export function getTipsForCycleDay(day: number) {
     baseTips = [
       { icon: "🥗", title: "Stay Comfortable", body: "On heavy flow days, prioritize comfort. Stay hydrated and use heating pads for relief.", note: "Listen to your body" },
       { icon: "🧘‍♀️", title: "Stay Hydrated", body: "Drink 2L of water daily to ease cramps and support your health.", note: "8 glasses/day" },
-      { icon: "🧘", title: "Gentle Movement", body: "Light stretching or yoga can ease discomfort and lift mood.", note: "Listen to your body" },
+      { icon: "🥗", title: "Gentle Movement", body: "Light stretching or yoga can ease discomfort and lift mood.", note: "Listen to your body" },
     ];
   } else if (day <= 13) {
     baseTips = [
-      { icon: "⚡", title: "High Energy Phase", body: "Your energy is rising. Great time for cardio and strength training.", note: "Push your limits" },
+      { icon: "🧘‍♀️", title: "High Energy Phase", body: "Your energy is rising. Great time for cardio and strength training.", note: "Push your limits" },
       { icon: "🥗", title: "Eat Light & Fresh", body: "Focus on iron-rich foods to replenish after your period.", note: "Nourish yourself" },
-      { icon: "🌞", title: "Social & Productive", body: "You may feel more social and focused. Use this energy wisely.", note: "You've got this" },
+      { icon: "🧘‍♀️", title: "Social & Productive", body: "You may feel more social and focused. Use this energy wisely.", note: "You've got this" },
     ];
   } else if (day <= 17) {
     baseTips = [
-      { icon: "🌸", title: "Ovulation Phase", body: "You're at peak fertility. Energy and confidence are high.", note: "Peak vitality" },
-      { icon: "💪", title: "Strength Training", body: "Leverage high estrogen for best workout performance.", note: "Go for it" },
-      { icon: "💧", title: "Stay Hydrated", body: "Drink plenty of water to support your body during ovulation.", note: "8 glasses/day" },
+      { icon: "🥗", title: "Ovulation Phase", body: "You're at peak fertility. Energy and confidence are high.", note: "Peak vitality" },
+      { icon: "🧘‍♀️", title: "Strength Training", body: "Leverage high estrogen for best workout performance.", note: "Go for it" },
+      { icon: "🥗", title: "Stay Hydrated", body: "Drink plenty of water to support your body during ovulation.", note: "8 glasses/day" },
     ];
   } else {
     baseTips = [
       { icon: "🧘", title: "Wind Down", body: "Your body is preparing for the next cycle. Rest and recover.", note: "Rest is productive" },
-      { icon: "🍫", title: "Manage Cravings", body: "PMS cravings are real. Opt for dark chocolate and complex carbs.", note: "Be kind to yourself" },
-      { icon: "😴", title: "Prioritise Sleep", body: "Aim for 8 hours. Progesterone dips can disrupt sleep.", note: "Sleep heals" },
+      { icon: "🧘‍♀️", title: "Manage Cravings", body: "PMS cravings are real. Opt for dark chocolate and complex carbs.", note: "Be kind to yourself" },
+      { icon: "🥗", title: "Prioritise Sleep", body: "Aim for 8 hours. Progesterone dips can disrupt sleep.", note: "Sleep heals" },
     ];
   }
 
