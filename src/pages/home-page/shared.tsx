@@ -190,7 +190,7 @@ export function ReferAndQuiz() {
           ].map((q) => (
             <button
               key={q.label}
-              className="flex items-center gap-1.5 bg-[#F3F4F6] text-[#0F172A] rounded-full px-4 py-1.5 text-[11px] font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 bg-[#F3F4F6] text-[#0F172A] rounded-full px-2 md:px-4 py-1.5 md:text-[11px] text-[8.2px]  font-medium hover:bg-primary/90 transition-colors"
             >
               <span 
               style={{ background: "linear-gradient(180deg, #B32070 0%, #FB3179 100%)" }}
