@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { AlertCircle, MoveRight, ChevronRight, CalendarCheck, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
+import { AlertCircle, MoveRight, CalendarCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 import closeIcon from "@/assets/close-icon.svg";
 import megaphone from "@/assets/megaphone.svg";
