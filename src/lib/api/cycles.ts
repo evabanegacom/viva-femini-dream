@@ -9,6 +9,11 @@ export interface Cycle {
   periodLength?: number;
   label?: string;
   notes?: string;
+  ovulationStartDate?: string;
+  ovulationEndDate?: string;
+  estimatedNextPeriod?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export async function getCycles(userId: string): Promise<Cycle[]> {
