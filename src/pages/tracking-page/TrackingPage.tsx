@@ -134,10 +134,10 @@ export function TrackingPage() {
   const canSave = !!userId && !!activeCycleId && !isPending && !isResolving;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mx-auto">
 
       {/* ── Left col ────────────────────────────────────────────────────── */}
-      <div className="lg:col-span-4 space-y-4">
+      <div className="lg:col-span-4 space-y-4 mx-auto">
 
         {/* Welcome card */}
         <div className="bg-white rounded py-20 px-6 shadow-sm border border-[#E8E8E8] text-center">
@@ -167,17 +167,17 @@ export function TrackingPage() {
       </div>
 
       {/* ── Right col ───────────────────────────────────────────────────── */}
-      <div className="lg:col-span-8 bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50 space-y-5">
+      <div className="lg:col-span-8 bg-white rounded p-5 md:p-3 shadow-sm border border-[#E8E8E8] space-y-5">
 
         {/* Physical Pain */}
         <div>
-          <h3 className="font-semibold text-sm mb-3">Physical Pain</h3>
+          <h3 className="font-semibold text-[#0F172A] mb-3">Physical Pain</h3>
           <PillGroup items={PHYSICAL_PAIN} value={physical} onChange={setPhysical} />
         </div>
 
         {/* Mood & Mental */}
         <div>
-          <h3 className="font-semibold text-sm mb-3">Mood & Mental</h3>
+          <h3 className="font-semibold text-[#0F172A] mb-3">Mood & Mental</h3>
           <PillGroup items={MOOD_MENTAL} value={mood} onChange={setMood} />
         </div>
 
@@ -185,14 +185,14 @@ export function TrackingPage() {
         <div>
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h3 className="font-semibold text-sm">Flow Intensity</h3>
-              <p className="text-xs text-muted-foreground">How heavy is your flow today?</p>
+              <h3 className="font-semibold text-[#0F172A]">Flow Intensity</h3>
+              <p className="font-medium text-[#6B7280]">How heavy is your flow today?</p>
             </div>
             {/* Dynamic flow value from slider state */}
             <span className="text-xs text-muted-foreground">{flow[0]}/10</span>
           </div>
           <Slider value={flow} onValueChange={setFlow} min={0} max={10} step={1} className="my-3" />
-          <div className="flex justify-between text-xs text-muted-foreground px-1">
+          <div className="flex justify-between text-[13px] font-medium text-[#6B7280] px-1">
             <span>Light</span><span>Medium</span><span>Heavy</span>
           </div>
         </div>
@@ -207,7 +207,7 @@ export function TrackingPage() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add a note about how you're feeling..."
-            className="w-full min-h-25 rounded-2xl border border-border bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+            className="w-full min-h-25 rounded border border-[#C8C8C8] bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           />
         </div>
 
@@ -229,7 +229,7 @@ export function TrackingPage() {
         <button
           onClick={handleSave}
           disabled={!canSave}
-          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold rounded-full py-3.5 text-sm flex items-center justify-center gap-2 transition-colors"
+          className="w-full bg-[#FB3179] hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-semibold rounded-full py-3.5 text-sm flex items-center justify-center gap-2 transition-colors"
         >
           {isResolving ? (
             <><Loader2 className="size-4 animate-spin" /> Loading...</>
