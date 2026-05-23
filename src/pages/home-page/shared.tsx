@@ -254,7 +254,7 @@ export function ReferAndQuiz() {
             >
               <span 
               style={{ background: "linear-gradient(180deg, #B32070 0%, #FB3179 100%)" }}
-              className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
+              className="md:h-8 md:w-8 w-6 h-6 text-xs rounded-full bg-white/20 flex items-center justify-center">
                 <img src={q.icon} alt={q.label} className="size-5" />
               </span>
               {q.label}
