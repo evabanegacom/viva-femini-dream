@@ -49,7 +49,7 @@ export function CycleHighlight({ tips, cycleDay, isLoading, error, onRetry }: {
     className: "cycle-highlight-slider",
     responsive: [
       { breakpoint: 1024, settings: { centerPadding: "80px" } },
-      { breakpoint: 768, settings: { centerPadding: "50px" } },
+      { breakpoint: 768, settings: { centerPadding: "150px" } },
       { breakpoint: 480, settings: { centerPadding: "20px" } },
     ],
   };
@@ -149,16 +149,21 @@ function Header({ cycleDay, isLoading }: { cycleDay: number; isLoading: boolean 
 
 function Card({ t }: { t: { icon: string; title: string; body: string; note: string; bg: string } }) {
   return (
-    <div 
-      style={{ background: t.bg }} 
-      className="mx-auto w-full max-w-[360px] rounded p-5 flex flex-col shadow-md"
+    <div className='flex gap-2 md:flex-row flex-col mx-auto w-full max-w-90 md:items-start items-center rounded-sm p-5 shadow-md'
+    style={{ background: t.bg }} 
     >
-      <div className="text-4xl mb-4">{t.icon}</div>
+              <div className="text-4xl mb-4">{t.icon}</div>
+
+    <div 
+      
+      className="flex flex-col md:items-start items-center text-center md:text-left gap-1 rounded p-3.5 text-sm font-medium text-[#0F172A] max-w-md"
+    >
       <h3 className="font-semibold text-xl mb-3 text-[#0F172A]">{t.title}</h3>
       <p className="text-[15px] text-[#0F172A] leading-relaxed flex-1">{t.body}</p>
       <div className="mt-5 bg-white/90 backdrop-blur-sm rounded-3xl p-3.5 text-xs font-medium">
         💜 {t.note}
       </div>
+    </div>
     </div>
   );
 }
