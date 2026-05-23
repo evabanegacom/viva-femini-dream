@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
 import { AlertCircle, ChevronDown, ChevronUp, Calendar1  } from "lucide-react";
 import { useMemo } from "react";
-
+import leavesRight from "@/assets/leaves-right.svg";
+import leavesLeft from "@/assets/leaves-left.svg";
+import dateFlowerUrl from "@/assets/date-flower.svg?url";
 
 function buildCalendarCells(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
@@ -33,7 +35,7 @@ function PulseBoxLight({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-xl bg-rose-100/70", className)} />;
 }
 
-const DAYS = ["S", "M", "T", "W", "T", "F", "S"];
+const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 function formatDate(dateStr: string) {
   if (!dateStr) return "—";
@@ -57,7 +59,6 @@ function Calendar({
     ? daysBetween(new Date().toISOString().split("T")[0], nextPeriodDate)
     : null;
   const cyclePercent = avgCycleLength ? Math.round((cycleDay / avgCycleLength) * 100) : 0;
-console.log({todayDate})
   return (
     <div
   className="overflow-hidden text-white shadow-lg relative rounded-b-3xl md:rounded-3xl"
@@ -92,7 +93,7 @@ console.log({todayDate})
         
 
         {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold opacity-80 mb-2">
+        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-normal opacity-80 mb-2">
           {DAYS.map((d, i) => <div key={i}>{d}</div>)}
         </div>
 
@@ -110,12 +111,15 @@ console.log({todayDate})
               const safeTodayDate = todayDate === -1 ? 1 : todayDate;
               const isToday = d === safeTodayDate;
               const isPeriod = periodDays.has(d);
+              // peak period day is the last day of the period, so the day before ovulation starts
+              const peakOv = ovulationDays.has(d + 1) && !ovulationDays.has(d);
               const isOv = ovulationDays.has(d);
               return (
                 <div key={i} className={cn(
                   "rounded-full px-6 py-3 font-bold flex items-center justify-center text-[12.5px] transition-all border border-white/40",
                   isToday && "bg-white text-black shadow-md font-bold ring-2 ring-white/60",
                   !isToday && isPeriod && "bg-[#FB3179] text-white",
+                  peakOv && "bg-[#FB3179] text-white shadow-sm ring-2 ring-white",
                   // Blue background for ovulation days — matching the screenshot exactly
                   !isToday && isOv && "bg-[#0D34F9] text-white shadow-sm",
                   !isToday && !isPeriod && !isOv && "text-white/90 hover:bg-white/10"
@@ -145,7 +149,7 @@ console.log({todayDate})
 
         {/* Cycle info card */}
         <div className="bg-white text-foreground rounded-2xl mt-5 p-5 text-center shadow-sm">
-          <p className="text-[11px] text-muted-foreground mb-2">Today is Cycle Day</p>
+          <p className="text-[12.15px] text-[#6B7280] font-semibold mb-2">Today is Cycle Day</p>
 
           {isLoading ? (
             <div className="flex flex-col items-center gap-2">
@@ -159,21 +163,22 @@ console.log({todayDate})
           ) : (
             <>
               {/* Big cycle day badge */}
-              <div className="mx-auto size-16 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+              <div
+                className="mx-auto cycle-date size-18 flex items-center justify-center text-[34.5px] font-bold text-white"
+              >
                 {cycleDay}
               </div>
-
               {/* Stats row */}
-              <p className="text-[11px] text-muted-foreground mt-2">
-                Avg. Cycle: {avgCycleLength} Days · Currently {cyclePercent}% complete
+              <p className="text-[11px] mt-2">
+                <span className="font-bold text-[#6B7280]">Avg. Cycle: {avgCycleLength} Days </span>· <span className="font-normal text-[#6C7278]">Currently: {cyclePercent}% out of 100</span>
               </p>
 
               {/* Next period */}
-              <div className="mt-3 flex items-center justify-center gap-2 text-xs flex-wrap">
-                <span className="px-3 py-1 rounded-full border border-rose-200 text-rose-500 font-medium text-[11px]">
+              <div className="mt-3 py-3 rounded-sm w-fit mx-auto px-8 border border-[#FB317999] flex items-center justify-center gap-2 text-xs flex-wrap">
+                <span className=" text-[#FB3179] font-normal text-[11px]">
                   Next Period
                 </span>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-[#FB3179] text-[12.15px] font-bold">
                   {nextPeriodDate
                     ? `${formatDate(nextPeriodDate)} (${daysUntilNext} Days)`
                     : "—"}
@@ -182,8 +187,9 @@ console.log({todayDate})
 
               {/* Fertile window */}
               {fertileWindowStart && (
-                <p className="text-[10px] text-muted-foreground mt-1.5">
-                  Fertile window starts {fertileWindowStart}
+                <p className="text-[11px] text-[#6B7280] mt-1.5">
+                  <span>Fertile window starts </span>
+                  <span className="font-bold">{fertileWindowStart}</span>
                 </p>
               )}
             </>
