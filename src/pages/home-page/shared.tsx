@@ -59,7 +59,7 @@ export function CycleHighlight({ tips, cycleDay, isLoading, error, onRetry }: {
         <div className="mt-4 flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x scrollbar-hide">
           {isLoading
             ? Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="min-w-[200px] flex-1 rounded-2xl p-4 bg-rose-50 animate-pulse snap-start">
+                <div key={i} className="min-w-[400px] flex-1 rounded-2xl p-4 bg-rose-50 animate-pulse snap-start">
                   <div className="size-8 rounded-full bg-rose-200 mb-3" />
                   <div className="h-3 w-3/4 bg-rose-200 rounded mb-2" />
                   <div className="h-3 w-full bg-rose-200 rounded" />
@@ -90,12 +90,12 @@ export function DailyCheckoffs({ topSymptom, mostFrequent, intensityChange, isLo
   topSymptom: string; mostFrequent: string; intensityChange: string;
   isLoading: boolean; error?: Error | null; onRetry?: () => void;
 }) {
+  console.log({topSymptom})
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-border/50">
         <div className="flex items-center gap-2 mb-3">
-          <Activity className="size-4 text-primary" />
-          <h3 className="font-semibold text-sm">Daily Check-Offs</h3>
+          <h3 className="font-bold text-[#0F172A]">Daily Check-Offs</h3>
         </div>
         {error ? (
           <InlineError message="Failed to load" onRetry={onRetry} />
@@ -107,12 +107,12 @@ export function DailyCheckoffs({ topSymptom, mostFrequent, intensityChange, isLo
         ) : (
           <div className="space-y-2.5 text-xs">
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Top Symptom Today</span>
-              <span className="text-rose-500 font-semibold">{topSymptom}</span>
+              <span className="text-[#0F172A] text-xs">Symptoms</span>
+              <span className="text-rose-500 font-semibold">{topSymptom}🍫</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Health Report</span>
-              <span className="text-emerald-500 font-semibold">View Report →</span>
+              <span className="text-[#0F172A] text-xs">Health Report</span>
+              <span className="text-[#16A34A] font-bold text-xs">Pilates (Logged)</span>
             </div>
           </div>
         )}
@@ -120,8 +120,7 @@ export function DailyCheckoffs({ topSymptom, mostFrequent, intensityChange, isLo
 
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-border/50">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="size-4 text-emerald-500" />
-          <h3 className="font-semibold text-sm">Trend Watch</h3>
+          <h3 className="font-semibold text-sm">📊 Trend Watch</h3>
         </div>
         {error ? (
           <InlineError message="Failed to load" onRetry={onRetry} />
@@ -133,14 +132,14 @@ export function DailyCheckoffs({ topSymptom, mostFrequent, intensityChange, isLo
         ) : (
           <div className="space-y-2.5 text-xs">
             <div className="flex justify-between items-center gap-2">
-              <span className="text-muted-foreground shrink-0">Most Frequent Symptom</span>
-              <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-500 font-semibold text-[11px]">
+              <span className="text-[#0F172A] font-medium text-xs">Most Frequent Symptom</span>
+              <span className="px-2 py-0.5 rounded-full bg-[#E948671A] text-[#FB3179] font-semibold text-sm">
                 {mostFrequent}
               </span>
             </div>
             <div className="flex justify-between items-center gap-2">
-              <span className="text-muted-foreground shrink-0">Symptom Intensity Change</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 font-semibold text-[11px]">
+              <span className="text-[#0F172A] font-medium text-xs">Symptom Intensity Change</span>
+              <span className="px-2 py-0.5 rounded-full bg-[#4FC4F838] text-[#07DBB1] font-bold text-sm">
                 {intensityChange}
               </span>
             </div>

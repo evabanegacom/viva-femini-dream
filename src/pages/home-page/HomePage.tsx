@@ -146,16 +146,24 @@ export function HomePage() {
 
   // Today's top symptom from today's log entry
   const topSymptom = useMemo(() => {
-    if (!Array.isArray(symptomLogs)) return "—";
-    const todayEntry = (symptomLogs as any[]).find((l: any) => l.date === todayStr);
-    if (!todayEntry) return "None logged";
-    return (
-      todayEntry.physicalSymptoms?.[0] ??
-      todayEntry.moodSymptoms?.[0]     ??
-      todayEntry.periodIndicators?.[0] ??
-      "None logged"
-    );
-  }, [symptomLogs, todayStr]);
+  const logs = Array.isArray(symptomLogs)
+    ? symptomLogs
+    : (symptomLogs as any)?.data;
+
+  if (!Array.isArray(logs)) return "—";
+
+  const todayEntry = logs.find((l: any) => l.date === todayStr);
+  if (!todayEntry) return "None logged";
+
+  return (
+    todayEntry.physicalSymptoms?.[0] ??
+    todayEntry.moodSymptoms?.[0]     ??
+    todayEntry.periodIndicators?.[0] ??
+    "None logged"
+  );
+}, [symptomLogs, todayStr]);
+
+  console.log({ symptomLogs, topSymptom });
 
   const tips = useMemo(() => getTipsForCycleDay(cycleDay), [cycleDay]);
 
