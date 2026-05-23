@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { AlertCircle, Activity, ChevronRight, CalendarCheck, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
+import { AlertCircle, MoveRight, ChevronRight, CalendarCheck, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
 import closeIcon from "@/assets/close-icon.svg";
 import megaphone from "@/assets/megaphone.svg";
@@ -287,23 +287,23 @@ export function Recommended({ narrative, isLoading }: { narrative: string; isLoa
 
   return (
     <div>
-      <h2 className="text-primary font-semibold mb-1">Recommended for You</h2>
+      <h2 className="text-[#FB3179] font-bold mb-1 bg-[#F3F4F6]">Recommended for You</h2>
       {isLoading ? (
         <div className="h-3 bg-rose-100 rounded animate-pulse w-2/3 mb-3" />
       ) : narrative ? (
         <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{narrative}</p>
       ) : null}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-[#F3F4F6]">
         {ARTICLES.map((it) => (
           <article
             key={it.title}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border/50 hover:shadow-md transition-shadow"
+            className="bg-white p-2 rounded-sm overflow-hidden shadow-sm border border-border/50 hover:shadow-md transition-shadow"
           >
-            <img src={it.img} alt={it.title} loading="lazy" className="w-full h-32 object-cover" />
-            <div className="p-4">
-              <h3 className="font-semibold text-sm leading-snug">{it.title}</h3>
-              <button className="mt-2 text-xs text-primary font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">
-                Read more <ChevronRight className="size-3" />
+            <img src={it.img} alt={it.title} loading="lazy" className="w-full rounded h-32 object-cover" />
+            <div className="mt-2">
+              <h3 className="font-bold text-sm text-[#000000]leading-snug">{it.title}</h3>
+              <button className="mt-2 text-sm text-[#B32070] font-medium inline-flex items-center gap-1 hover:gap-2 transition-all">
+                Read more <MoveRight className="size-3" />
               </button>
             </div>
           </article>
