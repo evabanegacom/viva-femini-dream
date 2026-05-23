@@ -21,30 +21,33 @@ const PERIOD_INDICATORS = ["Spotting", "Heavier flow", "Lighter flow", "Vaginal 
 const SEXUAL_HEALTH = ["Increased sex drive", "Decreased sex drive", "Vaginal discharge"];
 
 function Pill({
-  label, active, onClick, color = "rose",
+  label,
+  active,
+  onClick,
 }: {
-  label: string; active: boolean; onClick: () => void; color?: "rose" | "amber";
+  label: string;
+  active: boolean;
+  onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5",
+        "px-3 py-1.5 rounded-full border text-xs text-black transition-all flex items-center gap-1.5",
         active
-          ? color === "amber"
-            ? "bg-amber-400 text-white border-amber-400 shadow-sm"
-            : "bg-primary text-primary-foreground border-primary shadow-sm"
-          : color === "amber"
-          ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
-          : "bg-rose-50 text-rose-500 border-rose-100 hover:bg-rose-100"
+          ? "bg-[#FB3179] text-white border-[#FB3179] shadow-sm"
+          : "bg-[#FFE9F5] text-rose-500 border-rose-100 hover:bg-rose-100"
       )}
     >
-      <span className={cn(
-        "size-4 rounded-full flex items-center justify-center text-[9px]",
-        active ? "bg-white/30" : color === "amber" ? "bg-amber-200" : "bg-rose-200/60"
-      )}>
+      <span
+        className={cn(
+          "size-4 rounded-full flex items-center justify-center text-[9px]",
+          active ? "bg-white/30" : "bg-rose-200/60"
+        )}
+      >
         {active ? <Check className="size-2.5" /> : "•"}
       </span>
+
       {label}
     </button>
   );
@@ -207,7 +210,7 @@ export function TrackingPage() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add a note about how you're feeling..."
-            className="w-full min-h-25 rounded border border-[#C8C8C8] bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+            className="w-full min-h-40 rounded-sm border border-[#C8C8C8] bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           />
         </div>
 
