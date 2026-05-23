@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { seedUserIdQueryOptions, healthReportQueryOptions } from "@/queries/health-report";
 import { toApiError } from "@/lib/api/client";
-import type { ApiError } from "@/types/health-report-types";
+import type { ApiError, HealthReport } from "@/types/health-report-types";
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -77,21 +77,16 @@ export function HealthReportPage() {
     else refetchReport();
   }
 
-  console.log({flowChartData});
+const { cycleSummary, flowSummary, historicalCycles } = report ?? {};
 
-  if (isLoading) return <HealthReportSkeleton />;
-  if (error) return <ErrorState error={toApiError(error)} onRetry={handleRetry} />;
-  if (!report) return null;
-
-  const { cycleSummary, flowSummary, historicalCycles } = report;
-  console.log({historicalCycles})
-
-  const historicalRows = useMemo(() => {
+const historicalRows = useMemo(() => {
   if (!historicalCycles?.length) return [];
   return historicalCycles.flatMap((cycle: any) => cycle.rows ?? []);
 }, [historicalCycles]);
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+if (isLoading) return <HealthReportSkeleton />;
+if (error) return <ErrorState error={toApiError(error)} onRetry={handleRetry} />;
+if (!report) return null;
 
   return (
     <div className="space-y-4 md:space-y-6 animate-in fade-in duration-500">
@@ -100,7 +95,7 @@ export function HealthReportPage() {
         {/* ── Cycle Summary ─────────────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
           <h2 className="font-semibold mb-4">
-            Cycle Summary{cycleSummary.label ? ` — ${cycleSummary.label}` : ""}
+            Cycle Summary{cycleSummary?.label ? ` — ${cycleSummary?.label}` : ""}
           </h2>
           <div className="flex flex-wrap gap-2">
             {summary.map((s) => (
@@ -124,13 +119,13 @@ export function HealthReportPage() {
           </p>
           <p className="text-xs text-foreground/80 mt-3 leading-relaxed">
             {flowSummary?.narrative ||
-              `Your average cycle length is ${cycleSummary.cycleLength} days. Flow pattern remains within a typical range.`}
+              `Your average cycle length is ${cycleSummary?.cycleLength} days. Flow pattern remains within a typical range.`}
           </p>
-          {flowSummary?.tips?.length > 0 && (
+          {flowSummary && flowSummary?.tips?.length > 0 && (
             <>
               <p className="text-xs font-semibold text-primary mt-3">Tips To Adhere To:</p>
               <ul className="text-xs text-foreground/80 space-y-1 mt-1 list-disc list-inside">
-                {flowSummary.tips.map((tip, i) => (
+                {flowSummary?.tips.map((tip: string, i: number) => (
                   <li key={i}>{tip}</li>
                 ))}
               </ul>
@@ -180,7 +175,7 @@ export function HealthReportPage() {
           onClick={() => setMonthDropdownOpen((v) => !v)}
           className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
         >
-          {selectedMonth ?? cycleSummary.label ?? "All months"}
+          {selectedMonth ?? cycleSummary?.label ?? "All months"}
           <ChevronDown className={`size-3 transition-transform ${monthDropdownOpen ? "rotate-180" : ""}`} />
         </button>
         {monthDropdownOpen && (
