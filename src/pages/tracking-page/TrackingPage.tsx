@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { seedUserIdQueryOptions } from "@/queries/health-report";
 import { cyclesQueryOptions } from "@/queries/cycles";
 import { createSymptomLogMutation } from "@/queries/symptoms";
+import handHolding from "@/assets/hand-holding.svg";
 
 const PHYSICAL_PAIN = [
   "Cramps", "Diarrhoea", "Fatigue", "Headache", "Nausea",
@@ -139,30 +140,30 @@ export function TrackingPage() {
       <div className="lg:col-span-4 space-y-4">
 
         {/* Welcome card */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-border/50 text-center">
-          <div className="text-6xl mb-3">🌸</div>
-          <h2 className="font-bold text-lg">Welcome,</h2>
+        <div className="bg-white rounded py-20 px-6 shadow-sm border border-[#E8E8E8] text-center">
+          <img src={handHolding} alt="Hand Holding" className="mx-auto" />
+          <h2 className="font-semibold text-xl text-[#111827]">Welcome,</h2>
           <p className="text-sm text-muted-foreground">How are you doing today?</p>
           {/* Dynamic cycle label from API */}
-          {activeCycle?.label && (
-            <p className="text-xs text-primary font-medium mt-1">{activeCycle.label}</p>
-          )}
-          <p className="text-xs text-muted-foreground mt-2">
+          
+          <p className="text-xs text-[#6B7280] mt-0.5 md:w-65 w-100 mx-auto">
             Track your symptoms daily to understand your state of wellbeing
           </p>
         </div>
 
         {/* Period Indicators */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-border/50">
-          <h3 className="font-semibold text-sm mb-3">Period Indicators</h3>
+      <div className='border bg-white border-[#E8E8E8] rounded p-5 shadow-sm space-y-5'>
+        <div className="">
+          <h3 className="font-semibold text-[#0F172A] mb-3">Period Indicators</h3>
           <PillGroup items={PERIOD_INDICATORS} value={indicators} onChange={setIndicators} />
         </div>
 
         {/* Sexual Health */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-border/50">
-          <h3 className="font-semibold text-sm mb-3">Sexual Health</h3>
+        <div className="">
+          <h3 className="font-semibold text-[#0F172A] mb-3">Sexual Health</h3>
           <PillGroup items={SEXUAL_HEALTH} color="amber" value={sexual} onChange={setSexual} />
         </div>
+      </div>
       </div>
 
       {/* ── Right col ───────────────────────────────────────────────────── */}
