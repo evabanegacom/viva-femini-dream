@@ -23,66 +23,6 @@ export function InlineError({ message, onRetry }: { message: string; onRetry?: (
   );
 }
 
-// ── Cycle Highlight ───────────────────────────────────────────────────────────
-
-export function CycleHighlight({ tips, cycleDay, isLoading, error, onRetry }: {
-  tips: { icon: string; title: string; body: string; note: string; bg: string }[];
-  cycleDay: number; isLoading: boolean; error?: Error | null; onRetry?: () => void;
-}) {
-  console.log({tips})
-  return (
-    <div className="bg-white rounded-3xl p-5 md:p-3 shadow-sm border border-border/50">
-      <div className="flex items-center text-center flex-col justify-center gap-2 mb-1">
-        <div>
-          <h2 className="font-bold text-xl text-[#FB3179]">Cycle Highlight</h2>
-          <p className="text-sm w-65 text-[#0F172A] text-center">
-            Understand your cycle and take care during peak days
-          </p>
-        </div>
-        <span className="text-xs px-3 py-1.5 rounded-full bg-[#FFABC938] text-[#FB3179] font-bold whitespace-nowrap shrink-0">
-          {isLoading ? (
-            <span className="flex items-center gap-1">
-              <Loader2 className="size-3 animate-spin" /> Loading...
-            </span>
-          ) : (
-            <div className="flex items-center gap-1">
-              <CalendarCheck className="size-3 text-[#FB3179]" />
-              <span>Day {cycleDay}</span>
-            </div>
-          )}
-        </span>
-      </div>
-
-      {error ? (
-        <InlineError message="Failed to load highlights" onRetry={onRetry} />
-      ) : (
-        <div className="mt-4 flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x scrollbar-hide">
-          {isLoading
-            ? Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="min-w-[400px] flex-1 rounded-2xl p-4 bg-rose-50 animate-pulse snap-start">
-                  <div className="size-8 rounded-full bg-rose-200 mb-3" />
-                  <div className="h-3 w-3/4 bg-rose-200 rounded mb-2" />
-                  <div className="h-3 w-full bg-rose-200 rounded" />
-                  <div className="h-3 w-2/3 bg-rose-200 rounded mt-1" />
-                </div>
-              ))
-            : tips.map((t) => (
-                <div 
-                style={{ background: t.bg }}
-                key={t.title} className={cn("min-w-50 flex-1 snap-start rounded-2xl p-4", t.bg)}>
-                  <div className="text-2xl mb-2">{t.icon}</div>
-                  <h3 className="font-semibold text-lg mb-1">{t.title}</h3>
-                  <p className="text-base text-[#0F172A] leading-relaxed">{t.body}</p>
-                  <div className="mt-3 bg-white rounded-4xl p-3 flex items-center gap-1 text-xs text-primary font-medium">
-                    <span className='text-[#000000] font-lighter'>💜{t?.note}</span>
-                  </div>
-                </div>
-              ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── Daily Check-Offs ──────────────────────────────────────────────────────────
 

@@ -5,7 +5,8 @@ import { seedUserIdQueryOptions, healthReportQueryOptions } from "@/queries/heal
 import { cyclesQueryOptions } from "@/queries/cycles";
 import { symptomLogsQueryOptions } from "@/queries/symptoms";
 import Calendar from "@/pages/home-page/calendar";
-import { ReferAndQuiz, CycleHighlight, DailyCheckoffs, Recommended } from "./shared";
+import { ReferAndQuiz, DailyCheckoffs, Recommended } from "./shared";
+import { CycleHighlight } from "./cycle-cards";
 
 export function HomePage() {
   const [expanded, setExpanded] = useState(true);
