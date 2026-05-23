@@ -183,6 +183,7 @@ export function HomePage() {
           error={calendarError}
           onRetry={handleCalendarRetry}
         />
+        
         <ReferAndQuiz />
       </div>
 

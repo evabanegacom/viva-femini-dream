@@ -206,7 +206,7 @@ export function TrackingPage() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add a note about how you're feeling..."
-            className="w-full min-h-[100px] rounded-2xl border border-border bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+            className="w-full min-h-25 rounded-2xl border border-border bg-muted/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           />
         </div>
 

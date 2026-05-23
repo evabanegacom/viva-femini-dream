@@ -1,6 +1,15 @@
 import { cn } from "@/lib/utils";
 import { AlertCircle, Activity, ChevronRight, Droplet, FileText, Heart, Loader2, Sparkles, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
+import closeIcon from "@/assets/close-icon.svg";
+import megaphone from "@/assets/megaphone.svg";
+import positive from "@/assets/positive.svg";
+import negative from "@/assets/negative.svg";
+import faintLine from "@/assets/faint-line.svg";
+import didntTake from "@/assets/didnt-take.svg";
+import logPeriod from "@/assets/log-period.svg";
+import logSymptoms from "@/assets/log-symptoms.svg";
+import healthReport from "@/assets/health-report.svg";
 
 export function InlineError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
@@ -144,82 +153,111 @@ export function ReferAndQuiz() {
   const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
 
   const quizOptions = [
-    { label: "Didn't take test", emoji: "🧪" },
-    { label: "Positive",         emoji: "✅" },
-    { label: "Faint line",       emoji: "〰️" },
-    { label: "Negative",         emoji: "❌" },
+    { label: "Didn't take test", emoji: didntTake },
+    { label: "Positive",         emoji: positive },
+    { label: "Faint line",       emoji: faintLine },
+    { label: "Negative",         emoji: negative },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 bg-gray-200 rounded-3xl p-2 shadow-sm border border-border/50">
       {showRefer && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-border/50 flex items-start gap-3">
-          <div className="text-xl shrink-0">💕</div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">Refer your friends to VivaFemini 💕</p>
-            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-              Gift your friend 30 days of free Premium to help them thrive
-            </p>
-          </div>
-          <button onClick={() => setShowRefer(false)} className="text-muted-foreground hover:text-foreground shrink-0">
-            <X className="size-4" />
-          </button>
-        </div>
+       <div className="bg-white rounded-md px-4 py-6 shadow-sm border border-border/50 relative">
+  
+  <button
+    onClick={() => setShowRefer(false)}
+    className="absolute cursor-pointer top-3 right-3 text-muted-foreground hover:text-foreground"
+  >
+    <img src={closeIcon} alt="Close" className="size-4" />
+  </button>
+
+  {/* Content row */}
+  <div className="flex items-center justify-between gap-4">
+    
+    {/* Left text */}
+    <div className="flex-1 min-w-0">
+      <p className="font-bold text-[#0F172A] text-sm">
+        Refer your friends to VivaFemini 💕💐
+      </p>
+
+      <p className="text-[11px] font-medium text-[#6B7280] mt-0.5 leading-relaxed">
+        Gift your friend 30 days of free Premium to help them thrive
+      </p>
+    </div>
+
+    {/* Right image */}
+    <img
+      src={megaphone}
+      alt="Refer"
+      className="size-12 shrink-0"
+    />
+  </div>
+       </div>
       )}
 
       {showQuiz && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-border/50">
+        <div className="bg-white rounded-md p-4 shadow-sm border border-border/50">
           <div className="flex items-start justify-between gap-3 mb-3">
-            <p className="font-semibold text-sm">Hi! Did you take your pregnancy test?</p>
+            <p className="font-semibold text-sm text-[#0F172A]">Hi! Did you take your pregnancy test?</p>
             <button onClick={() => setShowQuiz(false)} className="text-muted-foreground hover:text-foreground shrink-0">
-              <X className="size-4" />
+              <img src={closeIcon} alt="Close" className="size-4" />
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+
+          <div className="flex items-center gap-3 justify-evenly">
             {quizOptions.map((o) => (
+              <div className="flex flex-col items-center text-center" key={o.label}>
               <button
-                key={o.label}
                 onClick={() => setQuizAnswer(o.label)}
                 className={cn(
-                  "rounded-2xl text-rose-500 font-medium px-2 py-2.5 flex flex-col items-center gap-1.5 transition-all text-[10px] leading-tight",
+                  "rounded-full font-medium w-12 h-12 justify-center flex flex-col items-center gap-1.5 transition-all text-[10px] leading-tight",
                   quizAnswer === o.label
                     ? "bg-rose-200 ring-1 ring-rose-400"
                     : "bg-rose-50 hover:bg-rose-100",
                 )}
+                style={{
+                  background: "linear-gradient(180deg, #B32070 0%, #FB3179 100%)",
+                }}
               >
-                <span className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-base">
-                  {o.emoji}
-                </span>
-                <span className="text-center">{o.label}</span>
+                <img src={o.emoji} alt={o.label} className="size-6" />
               </button>
+
+              <p className="text-center text-[#0F172A] text-xs mt-1">{o.label}</p>
+              </div>
             ))}
           </div>
-          <button className="mt-3 w-full bg-primary text-primary-foreground rounded-full py-2.5 text-xs font-semibold hover:bg-primary/90 transition-colors">
+          
+          <div className='mx-auto w-full mt-3 flex justify-center'>
+          <button className="mx-auto bg-[#E5E7EB] px-10 text-[#9CA3AF] rounded-full py-2.5 text-sm font-bold hover:bg-primary/90 transition-colors">
             Apply
           </button>
+          </div>
         </div>
       )}
 
-      <div>
-        <p className="text-xs font-semibold text-primary mb-2">Quick Action</p>
-        <div className="flex flex-wrap gap-2">
+      <div className='bg-white rounded-md p-4 shadow-sm border border-border/50'>
+        <p className="text-sm font-bold text-[#FB3179] mb-2">Quick Action</p>
+        <div className="flex flex-wrap justify-evenly gap-2">
           {[
-            { label: "Log symptoms", icon: <Sparkles className="size-3.5" /> },
-            { label: "Log period",   icon: <Droplet  className="size-3.5" /> },
-            { label: "Health Report",icon: <FileText  className="size-3.5" /> },
+            { label: "Log symptoms", icon: logSymptoms },
+            { label: "Log period",   icon: logPeriod },
+            { label: "Health Report",icon: healthReport },
           ].map((q) => (
             <button
               key={q.label}
-              className="flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 bg-[#F3F4F6] text-[#0F172A] rounded-full px-4 py-1.5 text-[11px] font-medium hover:bg-primary/90 transition-colors"
             >
-              <span className="size-5 rounded-full bg-white/20 flex items-center justify-center">
-                {q.icon}
+              <span 
+              style={{ background: "linear-gradient(180deg, #B32070 0%, #FB3179 100%)" }}
+              className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
+                <img src={q.icon} alt={q.label} className="size-5" />
               </span>
               {q.label}
             </button>
           ))}
         </div>
       </div>
+
     </div>
   );
 }

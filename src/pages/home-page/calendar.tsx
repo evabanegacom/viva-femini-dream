@@ -1,9 +1,6 @@
 import { cn } from "@/lib/utils";
 import { AlertCircle, ChevronDown, ChevronUp, Calendar1  } from "lucide-react";
 import { useMemo } from "react";
-import leavesRight from "@/assets/leaves-right.svg";
-import leavesLeft from "@/assets/leaves-left.svg";
-import dateFlowerUrl from "@/assets/date-flower.svg?url";
 
 function buildCalendarCells(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
