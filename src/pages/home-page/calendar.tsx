@@ -61,11 +61,7 @@ function Calendar({
   const cyclePercent = avgCycleLength ? Math.round((cycleDay / avgCycleLength) * 100) : 0;
   return (
     <div
-  className="overflow-hidden text-white shadow-lg relative rounded-b-3xl md:rounded-3xl"
-  style={{
-    background:
-      "linear-gradient(179.42deg, #FB3179 9.47%, #FFC0D6 90.53%)",
-  }}
+  className="overflow-hidden calendar-div text-white shadow-lg relative rounded-b-3xl md:rounded-3xl"
 >
 
       <div className="p-5 md:p-6 relative">
@@ -195,6 +191,7 @@ function Calendar({
             </>
           )}
         </div>
+        
       </div>
     </div>
   );

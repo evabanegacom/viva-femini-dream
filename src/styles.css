@@ -76,6 +76,35 @@ body {
   background-size: contain;
 }
 
+.calendar-div {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(179.42deg, #FB3179 9.47%, #FFC0D6 90.53%);
+}
+
+.calendar-div::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    url('./assets/leaves-right.svg'),
+    url('./assets/leaves-left.svg');
+
+  background-position:
+  right 0 bottom 150px,
+  left 0 bottom 150px;
+
+  background-repeat: no-repeat, no-repeat;
+
+  background-size:
+    120px,
+    120px;
+
+  z-index: 20;
+  pointer-events: none;
+}
+
 @layer base {
   * { border-color: var(--color-border); }
   body {
