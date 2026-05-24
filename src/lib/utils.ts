@@ -5,10 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const TIP_GRADIENTS = [
-  "linear-gradient(139.97deg, rgba(255, 171, 201, 0.22) 0.52%, #FFFFFF 99.48%)",
-  "linear-gradient(139.97deg, rgba(255, 193, 114, 0.22) 0.52%, #FFFFFF 99.48%)",
-  "linear-gradient(139.97deg, rgba(113, 253, 253, 0.22) 0.52%, #FFFFFF 99.48%)",
+const TIP_GRADIENTS = [
+  "linear-gradient(139.97deg, rgba(255, 171, 201, 0.22) 0.52%, #FFFFFF 99.48%), #FFABC9",
+  "linear-gradient(139.97deg, rgba(255, 193, 114, 0.22) 0.52%, #FFFFFF 99.48%), #FFC172",
+  "linear-gradient(139.97deg, rgba(113, 253, 253, 0.22) 0.52%, #FFFFFF 99.48%), #71FDFD",
 ];
 
 function getGradientForIndex(index: number): string {
