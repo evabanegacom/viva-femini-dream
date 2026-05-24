@@ -83,3 +83,272 @@ export function daysInMonth(
   return days;
 }
 
+
+// src/lib/download-report.ts
+// Generates and downloads a PDF of the Health Report using the browser's
+// built-in print dialog — no external PDF library needed.
+
+interface DownloadReportParams {
+  cycleSummary: {
+    label: string;
+    cycleLength: number;
+    periodDuration: number;
+    estimatedNextPeriod: string | null;
+    ovulationWindow: string | null;
+  };
+  flowSummary: {
+    narrative: string;
+    tips: string[];
+  };
+  historicalRows: Array<{
+    dateLabel: string;
+    timeLabel: string;
+    topSymptom: string;
+    totalSymptomsScore: string;
+    note: string | null;
+  }>;
+}
+
+export function downloadHealthReport({
+  cycleSummary,
+  flowSummary,
+  historicalRows,
+}: DownloadReportParams) {
+  // Build a self-contained HTML document styled for print
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>VívaFemme Health Report — ${cycleSummary.label}</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-size: 13px;
+          color: #0f172a;
+          padding: 40px 48px;
+          line-height: 1.5;
+        }
+
+        /* ── Header ── */
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 2px solid #FB3179;
+          padding-bottom: 16px;
+          margin-bottom: 24px;
+        }
+        .header h1 {
+          font-size: 22px;
+          font-weight: 700;
+          color: #FB3179;
+        }
+        .header .meta {
+          font-size: 11px;
+          color: #6b7280;
+          text-align: right;
+        }
+
+        /* ── Section ── */
+        .section {
+          margin-bottom: 28px;
+        }
+        .section h2 {
+          font-size: 14px;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 10px;
+          padding-bottom: 4px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+
+        /* ── Summary pills ── */
+        .pills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 12px;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 500;
+          border: 1px solid;
+        }
+        .pill-orange  { background: #F36F561A; color: #F36F56; border-color: #F36F56; }
+        .pill-pink    { background: #FB31791A; color: #FB3179; border-color: #FB3179; }
+        .pill-purple  { background: #7E19DF1A; color: #7E19DF; border-color: #7E19DF; }
+        .pill-blue    { background: #0D34F91A; color: #0D34F9; border-color: #0D34F9; }
+
+        /* ── Narrative ── */
+        .narrative {
+          font-size: 12px;
+          color: #374151;
+          line-height: 1.7;
+          margin-bottom: 10px;
+        }
+        .tips-title {
+          font-size: 12px;
+          font-weight: 600;
+          color: #FB3179;
+          margin-bottom: 6px;
+        }
+        .tips-list {
+          padding-left: 18px;
+          font-size: 12px;
+          color: #374151;
+        }
+        .tips-list li { margin-bottom: 3px; }
+
+        /* ── Table ── */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+        thead tr {
+          background: #fdf2f8;
+        }
+        th {
+          text-align: left;
+          padding: 8px 10px;
+          font-weight: 600;
+          color: #6b7280;
+          border-bottom: 1px solid #f1e6f0;
+        }
+        th.right { text-align: right; }
+        td {
+          padding: 8px 10px;
+          border-bottom: 1px solid #fce7f3;
+          vertical-align: top;
+        }
+        td.right { text-align: right; }
+        .date-label { font-weight: 500; }
+        .time-label { font-size: 10px; color: #9ca3af; }
+        tr:last-child td { border-bottom: none; }
+
+        /* ── Footer ── */
+        .footer {
+          margin-top: 32px;
+          padding-top: 12px;
+          border-top: 1px solid #f1f5f9;
+          font-size: 10px;
+          color: #9ca3af;
+          display: flex;
+          justify-content: space-between;
+        }
+
+        /* ── Print settings ── */
+        @media print {
+          body { padding: 20px 28px; }
+          @page { margin: 16mm; size: A4; }
+        }
+      </style>
+    </head>
+    <body>
+
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <h1>🌸 VívaFemme</h1>
+          <p style="font-size:13px; color:#6b7280; margin-top:2px;">
+            Health Report — ${cycleSummary.label}
+          </p>
+        </div>
+        <div class="meta">
+          Generated: ${new Date().toLocaleDateString("en-US", {
+            month: "long", day: "numeric", year: "numeric",
+          })}<br/>
+          Confidential · For personal use only
+        </div>
+      </div>
+
+      <!-- Cycle Summary -->
+      <div class="section">
+        <h2>Cycle Summary</h2>
+        <div class="pills">
+          <span class="pill pill-orange">🌸 Cycle Length: <strong>${cycleSummary.cycleLength} Days</strong></span>
+          <span class="pill pill-pink">💧 Period Duration: <strong>${cycleSummary.periodDuration} Days</strong></span>
+          <span class="pill pill-purple">📅 Estimated Next Period: <strong>${cycleSummary.estimatedNextPeriod ?? "—"}</strong></span>
+          <span class="pill pill-blue">🔵 Ovulation Window: <strong>${cycleSummary.ovulationWindow ?? "—"}</strong></span>
+        </div>
+      </div>
+
+      <!-- Flow & Symptoms Summary -->
+      <div class="section">
+        <h2>Flow &amp; Symptom Summary</h2>
+        <p class="narrative">${flowSummary?.narrative ?? ""}</p>
+        ${flowSummary?.tips?.length ? `
+          <p class="tips-title">Tips To Adhere To:</p>
+          <ul class="tips-list">
+            ${flowSummary.tips.map((t) => `<li>${t}</li>`).join("")}
+          </ul>
+        ` : ""}
+      </div>
+
+      <!-- Historical Cycle Data -->
+      <div class="section">
+        <h2>Historical Cycle Data</h2>
+        ${historicalRows.length > 0 ? `
+          <table>
+            <thead>
+              <tr>
+                <th style="width:28%">Date</th>
+                <th style="width:30%">Top Symptom</th>
+                <th class="right" style="width:20%">Total</th>
+                <th class="right" style="width:22%">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${historicalRows.map((row) => `
+                <tr>
+                  <td>
+                    <div class="date-label">${row.dateLabel ?? ""}</div>
+                    <div class="time-label">${row.timeLabel ?? ""}</div>
+                  </td>
+                  <td>${row.topSymptom ?? "—"}</td>
+                  <td class="right">${row.totalSymptomsScore ?? "—"}</td>
+                  <td class="right">${row.note ?? "—"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : `<p style="color:#9ca3af; font-size:12px; font-style:italic;">No records found.</p>`}
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <span>VívaFemme · Menstrual Health Tracking</span>
+        <span>${cycleSummary.label} · ${historicalRows.length} days logged</span>
+      </div>
+
+    </body>
+    </html>
+  `;
+
+  // Open in a hidden iframe and trigger print-to-PDF
+  const iframe = document.createElement("iframe");
+  iframe.style.cssText = "position:fixed; width:0; height:0; border:none; opacity:0;";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) return;
+
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  // Small delay lets the iframe finish rendering before print dialog opens
+  setTimeout(() => {
+    iframe.contentWindow?.focus();
+    iframe.contentWindow?.print();
+    // Clean up iframe after print dialog closes
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  }, 300);
+}

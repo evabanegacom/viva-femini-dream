@@ -20,7 +20,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background pb-24 md:pb-6">
       {/* Header */}
 
-<header className="sticky top-4 md:top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">  <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center">
+<header className="sticky top-0 md:top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">  
+<div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center">
 
     {/* LEFT */}
     <div className="flex items-center gap-3 shrink-0">
@@ -36,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
     {/* CENTER (perfectly centered) */}
     <div className="flex-1 flex justify-center">
-      <nav className="hidden md:flex items-center gap-1 bg-[#F3F4F6] rounded-full p-1 shadow-sm border border-border/50">
+      <nav className="hidden md:flex items-center gap-2 bg-[#F3F4F6] rounded-full p-2 shadow-sm border border-border/50">
         {tabs.map(({ to, label, icon: Icon }) => {
           const active = pathname === to;
           return (
