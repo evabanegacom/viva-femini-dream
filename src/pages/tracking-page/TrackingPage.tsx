@@ -39,7 +39,7 @@ function Pill({ label, active, onClick }: {
     <button
       onClick={onClick}
       className={cn(
-        "px-3 py-1.5 rounded-full border border-[#FB3179] text-xs transition-all flex items-center gap-1.5",
+        "px-3 py-1.5 cursor-pointer rounded-full border border-[#FB3179] text-xs transition-all flex items-center gap-1.5",
         active
           ? "bg-[#FB3179] text-white border-[#FB3179] shadow-sm"
           : "bg-[#FFE9F5] text-rose-500 border-[#FB3179] hover:bg-rose-100",

@@ -49,10 +49,10 @@ export function HealthReportPage() {
       : "—";
     const ovWindow = cycleSummary.ovulationWindow ?? "—";
     return [
-      { label: "Cycle Length", value: `${cycleSummary.cycleLength} Days`, color: "bg-rose-50 text-rose-600", icon: "🌸" },
-      { label: "Period Duration", value: `${cycleSummary.periodDuration} Days`, color: "bg-amber-50 text-amber-600", icon: "💧" },
-      { label: "Estimated Next Period", value: nextPeriod, color: "bg-purple-50 text-purple-600", icon: "📅" },
-      { label: "Ovulation Window", value: ovWindow, color: "bg-blue-50 text-blue-600", icon: "🔵" },
+      { label: "Cycle Length", value: `${cycleSummary.cycleLength} Days`, color: "bg-[#F36F561A] text-[#F36F56]", icon: "🌸", borderColor: '#F36F56', },
+      { label: "Period Duration", value: `${cycleSummary.periodDuration} Days`, color: "bg-[#FB31791A] text-[#FB3179]", icon: "💧", borderColor: '#FB3179' },
+      { label: "Estimated Next Period", value: nextPeriod, color: "bg-[#7E19DF1A] text-[#7E19DF]", icon: "📅", borderColor: '#7E19DF' },
+      { label: "Ovulation Window", value: ovWindow, color: "bg-[#0D34F91A] text-[#0D34F9]", icon: "🔵", borderColor: '#0D34F9' },
     ];
   }, [report]);
 
@@ -94,14 +94,16 @@ if (!report) return null;
 
         {/* ── Cycle Summary ─────────────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold mb-4">
+          <h2 className="font-bold mb-4 text-[#0F172A]">
             Cycle Summary{cycleSummary?.label ? ` — ${cycleSummary?.label}` : ""}
           </h2>
+
           <div className="flex flex-wrap gap-2">
             {summary.map((s) => (
               <div
                 key={s.label}
-                className={`${s.color} px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5`}
+                style={{ borderColor: s.borderColor }}
+                className={`${s.color} border border-[${s.borderColor}] mb-2 px-3 py-1.5 rounded-full text-[10px] font-medium flex items-center gap-1.5`}
               >
                 <span>{s.icon}</span>
                 <span className="opacity-70">{s.label}:</span>
@@ -109,11 +111,12 @@ if (!report) return null;
               </div>
             ))}
           </div>
+
         </div>
 
         {/* ── Flow & Symptom Summary ────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold">Flow & Symptom Summary</h2>
+          <h2 className="font-bold text-[#0F172A]">Flow & Symptom Summary</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             Understand your symptoms linked to sleep & activity
           </p>
@@ -123,8 +126,8 @@ if (!report) return null;
           </p>
           {flowSummary && flowSummary?.tips?.length > 0 && (
             <>
-              <p className="text-xs font-semibold text-primary mt-3">Tips To Adhere To:</p>
-              <ul className="text-xs text-foreground/80 space-y-1 mt-1 list-disc list-inside">
+              <p className="text-[13px] font-semibold text-primary mt-3">Tips To Adhere To:</p>
+              <ul className="text-sm text-foreground/80 space-y-1 mt-1 list-disc list-inside">
                 {flowSummary?.tips.map((tip: string, i: number) => (
                   <li key={i}>{tip}</li>
                 ))}
@@ -135,21 +138,21 @@ if (!report) return null;
 
         {/* ── Period Length Chart ───────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold">Period Length</h2>
+          <h2 className="font-bold text-sm">Period Length</h2>
           <p className="text-xs text-muted-foreground">
             Flow intensity over the cycle (0–10 scale)
           </p>
           <div className="mt-3">
             <LineChart data={flowChartData} />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             ↑ Higher peaks indicate stronger symptoms. Plateaus show heavier days.
           </p>
         </div>
 
         {/* ── Symptom Frequency ─────────────────────────────────────────────── */}
         <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
-          <h2 className="font-semibold">Symptom Frequency</h2>
+          <h2 className="font-bold text-[#0F172A]">Symptom Frequency</h2>
           <p className="text-xs text-muted-foreground">
             Study your body system & understand your wellbeing
           </p>
@@ -169,11 +172,11 @@ if (!report) return null;
       <div className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-border/50">
   <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
     <div>
-      <h2 className="font-semibold">Historical Cycle Data</h2>
+      <h2 className="text-xs text-[#0F172A]">Historical Cycle Data</h2>
       <div className="relative inline-block">
         <button
           onClick={() => setMonthDropdownOpen((v) => !v)}
-          className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
+          className="text-sm font-medium text-muted-foreground mt-1 inline-flex items-center gap-1 hover:text-foreground transition-colors"
         >
           {selectedMonth ?? cycleSummary?.label ?? "All months"}
           <ChevronDown className={`size-3 transition-transform ${monthDropdownOpen ? "rotate-180" : ""}`} />
@@ -222,7 +225,7 @@ if (!report) return null;
           <td className="py-3 text-right text-muted-foreground">
             {row.note ? (
               <span className="inline-flex items-center justify-end gap-1">
-                <span className="truncate max-w-[50px]">{row.note}</span>
+                <span className="truncate max-w-12.5">{row.note}</span>
                 <FileText className="size-3 shrink-0" />
               </span>
             ) : "—"}
