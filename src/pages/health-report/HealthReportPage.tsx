@@ -12,7 +12,8 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { seedUserIdQueryOptions, healthReportQueryOptions } from "@/queries/health-report";
 import { toApiError } from "@/lib/api/client";
-import type { ApiError, HealthReport } from "@/types/health-report-types";
+import type { ApiError } from "@/types/health-report-types";
+import { downloadHealthReport } from "@/lib/utils";
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -38,6 +39,27 @@ export function HealthReportPage() {
     ...healthReportQueryOptions(userId ?? "", selectedMonth),
     enabled: !!userId,
   });
+
+  // download health report
+
+  const downloadReport = () => {
+  if (!report) return;
+  downloadHealthReport({
+    cycleSummary: {
+      label:               cycleSummary?.label ?? "",
+      cycleLength:         cycleSummary?.cycleLength ?? 0,
+      periodDuration:      cycleSummary?.periodDuration ?? 0,
+      estimatedNextPeriod: cycleSummary?.estimatedNextPeriod ?? null,
+      ovulationWindow:     cycleSummary?.ovulationWindow ?? null,
+    },
+    flowSummary: {
+      narrative: flowSummary?.narrative ?? "",
+      tips:      flowSummary?.tips ?? [],
+    },
+    // historicalRows is already computed in your useMemo above
+    historicalRows,
+  });
+};
 
   // ── Derived display values ─────────────────────────────────────────────────
 
@@ -83,6 +105,13 @@ const historicalRows = useMemo(() => {
   if (!historicalCycles?.length) return [];
   return historicalCycles.flatMap((cycle: any) => cycle.rows ?? []);
 }, [historicalCycles]);
+
+const tableHeaders = [
+  { label: "Date", width: "30%", align: "left" },
+  { label: "Top Symptom", width: "28%", align: "left" },
+  { label: "Total", width: "20%", align: "right" },
+  { label: "Note", width: "22%", align: "right" },
+];
 
 if (isLoading) return <HealthReportSkeleton />;
 if (error) return <ErrorState error={toApiError(error)} onRetry={handleRetry} />;
@@ -196,32 +225,41 @@ if (!report) return null;
         )}
       </div>
     </div>
-    <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity">
-      <Download className="size-3.5" /> Download PDF
-    </button>
+    <button
+  onClick={downloadReport}
+  className="inline-flex cursor-pointer items-center gap-2 bg-[#B32070] text-primary-foreground px-4 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity"
+>
+  <Download className="size-3.5" /> Download PDF
+</button>
   </div>
 
  {historicalRows.length > 0 ? (
   <table className="w-full text-xs table-fixed">
     <thead>
-      <tr className="text-left text-muted-foreground border-b border-border">
-        <th className="py-2 font-medium w-[30%]">Date</th>
-        <th className="py-2 font-medium w-[28%]">Top Symptom</th>
-        <th className="py-2 font-medium w-[20%] text-right">Total</th>
-        <th className="py-2 font-medium w-[22%] text-right">Note</th>
-      </tr>
-    </thead>
+  <tr className="text-left text-muted-foreground border-b border-border">
+    {tableHeaders.map((h) => (
+      <th
+        key={h.label}
+        className={`py-2 font-medium w-[${h.width}] ${
+          h.align === "right" ? "text-right" : "text-left"
+        }`}
+      >
+        {h.label}
+      </th>
+    ))}
+  </tr>
+</thead>
     <tbody>
       {historicalRows.map((row: any, i: number) => (
         <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-rose-50/50">
           <td className="py-3 pr-2">
-            <div className="font-medium">{row.dateLabel}</div>
+            <div className="">{row.dateLabel}</div>
             <div className="text-[10px] text-muted-foreground">{row.timeLabel}</div>
           </td>
-          <td className="py-3 pr-2 font-medium text-foreground truncate">
+          <td className="py-3 pr-2 text-foreground truncate">
             {row.topSymptom || "—"}
           </td>
-          <td className="py-3 text-right font-medium">{row.totalSymptomsScore ?? "—"}</td>
+          <td className="py-3 text-right">{row.totalSymptomsScore ?? "—"}</td>
           <td className="py-3 text-right text-muted-foreground">
             {row.note ? (
               <span className="inline-flex items-center justify-end gap-1">
