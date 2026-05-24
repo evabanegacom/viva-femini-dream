@@ -322,7 +322,7 @@ export function TrackingPage() {
         <button
           onClick={handleSave}
           disabled={!canSave}
-          className="w-full bg-[#FB3179] hover:bg-primary/90 disabled:opacity-60 text-white font-semibold rounded-full py-3.5 text-sm flex items-center justify-center gap-2 transition-colors"
+          className="w-full bg-[#FB3179] cursor-pointer hover:bg-primary/90 disabled:opacity-60 text-white font-semibold rounded-full py-3.5 text-sm flex items-center justify-center gap-2 transition-colors"
         >
           {isResolving ? (
             <><Loader2 className="size-4 animate-spin" /> Loading...</>
