@@ -283,23 +283,15 @@ export function TrackingPage() {
         </div>
 
         {/* Notes */}
-        <div className="rounded-xl border border-[#C8C8C8] bg-white focus-within:ring-2 focus-within:ring-primary/30 transition-all">
-  {/* Header — icon + label share the same border as the textarea */}
-  <div className="flex items-center justify-between px-3 pt-3 pb-1">
-    <div className="flex items-center gap-1.5">
-      <img src={textareaNotes} alt="Notes" className="size-4" />
-      <span className="text-sm font-semibold text-[#0F172A]">Notes</span>
-    </div>
-  </div>
-
-  {/* Textarea — no own border, inherits the outer card's border */}
-  <textarea
-    value={notes}
-    onChange={(e) => setNotes(e.target.value)}
-    placeholder="Inputting Note"
-    className="w-full min-h-32 rounded-b-xl bg-transparent px-3 pb-3 pt-1 text-sm text-[#0F172A] placeholder:text-[#C8C8C8] focus:outline-none resize-none"
-  />
-</div>
+        <div className='border border-[#C8C8C8] p-3 rounded-sm'>
+          <img src={textareaNotes} alt="Notes" className="mb-2" />
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Inputting notes"
+            className="w-full min-h-30 border-0 text-sm focus:outline-none resize-none"
+          />
+        </div>
 
         {/* API save error */}
         {isError && (
