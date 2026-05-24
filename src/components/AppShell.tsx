@@ -20,7 +20,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background pb-24 md:pb-6">
       {/* Header */}
 
-<header className="sticky top-4 md:top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">  
+<header className="sticky top-0 md:top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">  
 <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center">
 
     {/* LEFT */}
